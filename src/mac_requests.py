@@ -23,7 +23,7 @@ class CERequests(object):
     """
 
     http_headers: dict = {}
-    mac_logger: logging.Logger = None
+    mac_logger: logging.Logger
 
     def __init__(self):
         """
@@ -56,7 +56,7 @@ class CERequests(object):
         """
         Send the request.
         """
-        response = None
+        response : requests.Response = requests.Response()
 
         self.mac_logger.debug("Sending {0} request to {1}".format(
             http_action,

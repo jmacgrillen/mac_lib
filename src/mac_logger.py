@@ -31,9 +31,9 @@ def configure_logger(log_file_uri: str = None,
     """
     # We may not need a file, so only configure it if it's been set.
     # Otherwise just dump to the console.
-    log_formatter: logging.Formatter = None
-    mac_logger: logging.Logger = None
-    log_file_handler: logging.Handler = None
+    log_formatter: logging.Formatter
+    mac_logger: logging.Logger
+    log_file_handler: logging.Handler
 
     log_formatter = logging.Formatter(
             fmt="{ event_time : \"%(asctime)s.%(msecs)03d\", level : \"%("

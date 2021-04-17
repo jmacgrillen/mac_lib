@@ -45,7 +45,7 @@ def get_parent_dir(os_path: str) -> str:
     """
     Get the parent directory.
     """
-    return Path(os_path).parents[1]
+    return str(Path(os_path).parents[1])
 
 
 def delete_file(os_path: str) -> bool:

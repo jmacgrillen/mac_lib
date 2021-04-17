@@ -20,12 +20,12 @@ class MacDetect(object):
     """
     Gather some information about the platform we're running on.
     """
-    os_name: str = None
-    os_version: str = None
-    architecture: str = None
-    python_version: str = None
-    python_compiler: str = None
-    python_implementation: str = None
+    os_name: str
+    os_version: str
+    architecture: str
+    python_version: str
+    python_compiler: str
+    python_implementation: str
 
     def __init__(self):
         """

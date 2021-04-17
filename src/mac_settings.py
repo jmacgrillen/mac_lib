@@ -14,6 +14,7 @@
 
 import logging
 import yaml
+from typing import Optional
 import mac_lib.mac_file_management as file_m
 
 
@@ -23,14 +24,14 @@ class CESettingsFile(object):
     This is just a simple way of getting at those settings.
     """
 
-    mac_logger: logging.Logger = logging.getLogger("mac_logger")
-    settings_file_directory: str = None
-    settings_file_name: str = None
-    settings_file_full_path: str = None
-    settings: dict = None
-    able_to_update: bool = False
-    __instance = None
-    loaded_from_file: bool = None
+    mac_logger:logging.Logger = logging.getLogger("mac_logger")
+    settings_file_directory:str
+    settings_file_name:str
+    settings_file_full_path:str
+    settings:dict
+    able_to_update:bool
+    __instance:object
+    loaded_from_file:bool
 
     def __init__(self,
                  yaml_file_directory: str = None,
@@ -40,7 +41,8 @@ class CESettingsFile(object):
         """
         if yaml_file_directory:
             self.settings_file_directory = yaml_file_directory
-            self.settings_file_name = yaml_file
+            if yaml_file:
+                self.settings_file_name = yaml_file
             self.settings_file_full_path = "{0}/{1}".format(
                                         yaml_file_directory,
                                         yaml_file)
@@ -56,7 +58,7 @@ class CESettingsFile(object):
                                 cls, *args, **kwargs)
         return cls.__instance
 
-    def load_settings(self) -> dict:
+    def load_settings(self) -> Optional[dict]:
         """
         Load the settings.
         """
@@ -119,11 +121,11 @@ class CESettingsFile(object):
         """
         Update the settings.
         """
-        self.mac_logger("Saving setting {0}.".format(setting_key))
+        self.mac_logger.info("Saving setting {0}.".format(setting_key))
         self.settings[setting_key] = settings_value
         self.save_settings()
 
-    def __getitem__(self, key: str) -> str:
+    def __getitem__(self, key: str) -> Optional[str]:
         """
         When requested return the value of a particular key.
         """

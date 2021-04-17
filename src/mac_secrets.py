@@ -39,7 +39,7 @@ class CESecrets(object):
     seed_file_name: str = "{0}/seed.p".format(
         e_screen_settings_directory)
     seed_length: int = 24
-    seed: str = None
+    seed: str
     kp_file_name: str = "{0}/kfileConfigVerify.p".format(
         e_screen_settings_directory)
     sdb_file_name: str = '{0}/sdbfileNsxConfigVerify'.format(
@@ -49,7 +49,7 @@ class CESecrets(object):
     block_size: int = 16
     iv_size: int = 16
     salt_size: int = 8
-    __instance = None
+    __instance: object
 
     def __init__(self):
         """
