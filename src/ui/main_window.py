@@ -24,6 +24,7 @@ class MacWindow(tk.Toplevel):
     parent:tk.Tk
     main_content:ttk.Frame
     status_bar:MacStatusBar
+    menu_bar:tk.Menu
 
     def __init__(self, 
                  parent:tk.Tk,
@@ -53,6 +54,15 @@ class MacWindow(tk.Toplevel):
         """
         self.status_bar = MacStatusBar(parent=self.main_content,
                                        default_text=default_text)
+
+    def add_menu_bar(self):
+        """
+        Most apps need a menu bar. May as well connect it to the window.
+        """
+        self.menu_bar = tk.Menu(master=self.parent)
+        self.parent.configure(menu=self.menu_bar)
+
+
 
 if __name__ == "__main__":
     pass
