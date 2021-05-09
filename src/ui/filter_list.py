@@ -48,7 +48,7 @@ class MacFilterListBox(tk.Frame):
         self.__main_list = data_list
         self.update_list_box()
 
-    def update_list_box(self, *args):
+    def update_list_box(self):
         """
         Update the displayed list based on what has been typed
         """
