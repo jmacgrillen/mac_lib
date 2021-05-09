@@ -29,7 +29,7 @@ class MacFilterListBox(tk.Frame):
     displayed_items_index: list = []
 
 
-    def __init__(self, parent:tk.Misc, data_list:list, width:int, *args, **kwargs):
+    def __init__(self, parent:tk.Misc, data_list:list, width:int=50, *args, **kwargs):
         """
         Create the filtered list box.
         """
@@ -61,3 +61,6 @@ class MacFilterListBox(tk.Frame):
             if search_term.lower() in item.lower():
                 self.__list_box.insert(tk.END, item)
                 self.displayed_items_index.append(index)
+
+if __name__ == "__main__":
+    pass
