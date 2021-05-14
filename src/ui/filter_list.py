@@ -82,15 +82,12 @@ class MacFilterListBox(tk.Frame):
             self.selected_value = event_widget.get(index)
             self.selected_index = self.__displayed_items_index[index]
             if '_MacFilterListBox__bound_call_back' in vars(self):
-                kwargs = {
-                    "selected_value": self.selected_value,
-                    "selected_index": self.selected_index
-                }
-                self.__bound_call_back(kwargs)
+                self.__bound_call_back(selected_value=self.selected_value,
+                                       selected_index=self.selected_index)
 
     def bind(self, call_back:typing.Callable) -> None:
         """
-        Bind the callback function.
+        Store the callback function used when a selection has been made.
         """
         self.__bound_call_back = call_back
 
