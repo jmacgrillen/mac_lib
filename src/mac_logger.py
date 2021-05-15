@@ -3,7 +3,11 @@
     Name:
         mac_logger.py
     Desscription:
-        Setup logging.
+        Setup logging to include:
+         - ISO8601 date formatting.
+         - Optional use UTC.
+         - Render as SYSLOG or JSON.
+         - Rotate log files at 1MB, keeps the last 5.
     Version:
         1 - Inital release
     Author:
@@ -17,10 +21,14 @@ import sys
 import logging
 import logging.handlers
 
+FORMAT_SYSLOG = 1
+FORMAT_JSON = 2
 
 def configure_logger(log_file_uri: str = None,
                      logging_level: int = logging.INFO,
-                     use_stdout: bool = True) -> logging.Logger:
+                     use_stdout: bool = True,
+                     use_utc: bool = False,
+                     use_format: int = FORMAT_SYSLOG) -> logging.Logger:
     """
     Setup the built in logger to work as we want it.
 
@@ -28,19 +36,35 @@ def configure_logger(log_file_uri: str = None,
     :arg logging_level: What level do we want to start logging at?
                         Default is set to INFO
     :arg use_stdout: Flag to show whether to output to stdout or not.
+    :arg use_utc: Log timestamp will use UTC. False by default
+    :arg use_format: Format the output as SYSLOG or JSON. Default is SYSLOG.
     """
     # We may not need a file, so only configure it if it's been set.
     # Otherwise just dump to the console.
     log_formatter: logging.Formatter
     mac_logger: logging.Logger
     log_file_handler: logging.Handler
+    format_config: str
+    date_config: str
+
+    if use_format is FORMAT_JSON:
+        format_config = "{ event_time : \"%(asctime)s.%(msecs)03d\", level :"
+        " \"%(levelname)s\", function_name: \"%(module)s."
+        "%(funcName)s\", message: \"%(message)s\" }"
+    else:
+        format_config = "%(asctime)s.%(msecs)03d %(levelname)s "
+        "%(module)s.%(funcName)s %(message)s"
+
+    if use_utc:
+        date_config = "%Y-%m-%dT%H:%M:%S%Z"
+    else:
+        date_config = "%Y-%m-%dT%H:%M:%S"
 
     log_formatter = logging.Formatter(
-            fmt="{ event_time : \"%(asctime)s.%(msecs)03d\", level : \"%("
-                "levelname)s\", function_name: \"%(module)s.%(funcName)s\","
-                " message: \"%(message)s\" }",
-            datefmt="%Y-%m-%dT%H:%M:%S"
+            fmt=format_config,
+            datefmt=date_config
         )
+
     mac_logger = logging.getLogger(name='mac_logger')
 
     if log_file_uri:
