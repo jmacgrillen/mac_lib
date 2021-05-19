@@ -14,7 +14,7 @@
 
 import tkinter as tk
 import tkinter.ttk as ttk
-from src.ui.status_bar import MacStatusBar
+from ui.status_bar import MacStatusBar
 
 
 class MacWindow(tk.Toplevel):
