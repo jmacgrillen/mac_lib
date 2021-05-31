@@ -13,6 +13,7 @@
 """
 
 import tkinter as tk
+from tkinter.constants import FLAT
 import tkinter.ttk as ttk
 import typing
 
@@ -38,13 +39,13 @@ class MacFilterListBox(tk.Frame):
         Create the filtered list box.
         """
         super(MacFilterListBox, self).__init__(parent, *args, **kwargs)
-        self.grid(row=0, column=0, sticky='ns', padx=5.0)
+        self.grid(row=0, column=0, sticky='ns', padx=5.0, pady=2.0)
         self.grid_propagate(True)
         self.__filter_text = tk.StringVar()
         self.__filter_text.trace(mode="w", callback=self.update_list_box)
         self.__filter_box = ttk.Entry(self, textvariable=self.__filter_text, width=width)
         self.__filter_box.grid(row=0, sticky='n')
-        self.__list_box = tk.Listbox(self, width=width)
+        self.__list_box = tk.Listbox(self, width=width, relief=FLAT)
         self.__list_box.grid(row=1,column=0, sticky='ns')
         self.__list_box.bind(sequence='<<ListboxSelect>>', func=self.on_select)
         self.selected_value = ""
