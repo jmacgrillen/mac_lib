@@ -20,6 +20,7 @@ import os
 import sys
 import logging
 import logging.handlers
+import time
 
 FORMAT_SYSLOG = 1
 FORMAT_JSON = 2
@@ -27,7 +28,7 @@ FORMAT_JSON = 2
 def configure_logger(log_file_uri: str = None,
                      logging_level: int = logging.INFO,
                      use_stdout: bool = True,
-                     use_utc: bool = False,
+                     use_utc: bool = True,
                      use_format: int = FORMAT_SYSLOG) -> logging.Logger:
     """
     Setup the built in logger to work as we want it.
@@ -48,23 +49,30 @@ def configure_logger(log_file_uri: str = None,
     date_config: str
 
     if use_format is FORMAT_JSON:
-        format_config = "{ event_time : \"%(asctime)s.%(msecs)03d\", level :"
-        " \"%(levelname)s\", function_name: \"%(module)s."
-        "%(funcName)s\", message: \"%(message)s\" }"
+        if use_utc:
+            format_config = "{ event_time : \"%(asctime)s.%(msecs)03dZ\", level :" \
+            " \"%(levelname)s\", function_name: \"%(module)s." \
+            "%(funcName)s\", message: \"%(message)s\" }"
+        else:
+            format_config = "{ event_time : \"%(asctime)s.%(msecs)03d\", level :" \
+            " \"%(levelname)s\", function_name: \"%(module)s." \
+            "%(funcName)s\", message: \"%(message)s\" }"
     else:
-        format_config = "%(asctime)s.%(msecs)03d %(levelname)s "
-        "%(module)s.%(funcName)s %(message)s"
+        if use_utc:
+            format_config = "%(asctime)s.%(msecs)03dZ %(levelname)s " \
+            "%(module)s.%(funcName)s %(message)s"
+        else:
+            format_config = "%(asctime)s.%(msecs)03d %(levelname)s " \
+            "%(module)s.%(funcName)s %(message)s"
 
-    if use_utc:
-        date_config = "%Y-%m-%dT%H:%M:%S%Z"
-    else:
-        date_config = "%Y-%m-%dT%H:%M:%S"
+    date_config = "%Y-%m-%dT%H:%M:%S"
 
     log_formatter = logging.Formatter(
             fmt=format_config,
             datefmt=date_config
         )
-
+    if use_utc:
+        log_formatter.converter = time.gmtime
     mac_logger = logging.getLogger(name='mac_logger')
 
     if log_file_uri:
@@ -74,7 +82,7 @@ def configure_logger(log_file_uri: str = None,
             try:
                 os.makedirs(os.path.dirname(log_file_uri))
             except OSError as o_error:
-                print("Unable to create the logging directory "
+                print("Unable to create the logging directory " \
                       "{0}.\n{1}".format(os.path.dirname(log_file_uri),
                                          o_error.strerror))
                 sys.exit(1)

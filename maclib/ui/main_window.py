@@ -14,7 +14,7 @@
 
 import tkinter as tk
 import tkinter.ttk as ttk
-from ui.status_bar import MacStatusBar
+from maclib.ui.status_bar import MacStatusBar
 
 
 class MacWindow(tk.Toplevel):
@@ -36,17 +36,19 @@ class MacWindow(tk.Toplevel):
         """
         super(MacWindow, self).__init__(*args, **kwargs)
         self.parent = parent
-        self.parent.geometry("1024x768")
+        self.parent.geometry("800x600")
         self.withdraw()
         # When the window is closed, kill the program.
         self.protocol(
             "WM_DELETE_WINDOW",
             self.parent.destroy)
-        self.main_content = ttk.Frame(self.parent)
-        self.main_content.pack(fill='both', expand=True)
-        
-        self.main_content.grid_rowconfigure(0, weight=1)
-        self.main_content.grid_columnconfigure(0, weight=1)
+        self.parent.grid_rowconfigure(index=0, weight=1)
+        self.parent.grid_columnconfigure(index=0, weight=1)
+        self.main_content = ttk.Frame(master=self.parent)
+        self.main_content.grid(row=0, column=0, sticky='nswe')
+        self.main_content.grid_rowconfigure(index=0, weight=1)
+        self.main_content.grid_columnconfigure(index=0, weight=1)
+        self.main_content.grid_propagate(True)
 
     def add_status_bar(self, default_text:str="Ready"):
         """
@@ -61,7 +63,6 @@ class MacWindow(tk.Toplevel):
         """
         self.menu_bar = tk.Menu(master=self.parent)
         self.parent.configure(menu=self.menu_bar)
-
 
 
 if __name__ == "__main__":

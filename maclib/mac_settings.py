@@ -15,7 +15,7 @@
 import logging
 import yaml
 from typing import Optional
-import mac_lib.mac_file_management as file_m
+import maclib.mac_file_management as file_m
 
 
 class CESettingsFile(object):

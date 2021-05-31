@@ -34,12 +34,13 @@ class MacStatusBar(tk.Frame):
         """
         super(MacStatusBar, self).__init__(*args, **kwargs)
         self.parent = parent
-        self.pack(fill='x', expand=False)
+        self.grid(row=2, column=0,
+                  sticky='wse', padx=3, pady=2)
+        self.grid_propagate(True)
         self.status_text = tk.StringVar()
         self.status_text.set(default_text)
         self.status_bar = ttk.Label(master=self,
                                     textvariable=self.status_text,
-                                    relief=tk.SUNKEN,
                                     anchor=tk.W)
         self.status_bar.grid(row=1, column=0, sticky='we')
         self.size_grip = ttk.Sizegrip(self)

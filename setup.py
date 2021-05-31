@@ -18,37 +18,35 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 install_requirements = [
-    "PyYaml=>5.3"
+    "PyYaml"
 ]
 
 def setup_maclib_package() -> None:
     """
     Install and configure the mac_lib package for use
     """
-    maclib_metdata = dict(
-        name="waldo",
+    setup(
+        name='maclib',
         version="0.0.1",
-        author="John MacGrillen",
-        author_email="john.macgrillen@thecodeexpress.com",
-        description="Handy set of utilities for creating Python applications",
+        description='Useful stuff for building apps',
         long_description=long_description,
-        long_description_content_type="text/markdown",
-        packages=find_packages(exclude=["*.tests",
-                                        "*.tests.*",
-                                        "tests.*",
-                                        "tests"]),
-        package_dir={"maclib": "src"},
-        py_modules=["maclib"],
+        author='J.MacGrillen',
+        scripts=[],
+        packages=find_packages(exclude=['tests*']),
+        include_package_data=True,
         install_requires=install_requirements,
+        license="Apache License 2.0",
+        python_requires=">= 3.7.*",
         classifiers=[
-            "Programming Language :: Python :: 3",
-            "License :: OSI Approved :: MIT License",
-            "Operating System :: OS Independent",
+            'Development Status :: 5 - Production/Stable',
+            'Intended Audience :: Developers',
+            'Natural Language :: English',
+            'License :: OSI Approved :: Apache Software License',
+            'Programming Language :: Python',
+            'Programming Language :: Python :: 3',
         ],
-        python_requires='>=3.7',
     )
 
-    setup(**maclib_metdata)
 
 if __name__ == "__main__":
     setup_maclib_package()

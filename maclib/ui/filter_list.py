@@ -38,14 +38,15 @@ class MacFilterListBox(tk.Frame):
         Create the filtered list box.
         """
         super(MacFilterListBox, self).__init__(parent, *args, **kwargs)
-        self.pack(fill='y', expand=True)
+        self.grid(row=0, column=0, sticky='ns', padx=5.0)
+        self.grid_propagate(True)
         self.__filter_text = tk.StringVar()
-        self.__filter_text.trace("w", self.update_list_box)
+        self.__filter_text.trace(mode="w", callback=self.update_list_box)
         self.__filter_box = ttk.Entry(self, textvariable=self.__filter_text, width=width)
         self.__filter_box.grid(row=0, sticky='n')
         self.__list_box = tk.Listbox(self, width=width)
-        self.__list_box.grid(row=1,column=0)
-        self.__list_box.bind('<<ListboxSelect>>', self.on_select)
+        self.__list_box.grid(row=1,column=0, sticky='ns')
+        self.__list_box.bind(sequence='<<ListboxSelect>>', func=self.on_select)
         self.selected_value = ""
         self.selected_index = -1
         self.__scroll_bar = ttk.Scrollbar(self, orient='vertical')
@@ -53,19 +54,21 @@ class MacFilterListBox(tk.Frame):
         self.__list_box.config(yscrollcommand=self.__scroll_bar.set)
         self.__scroll_bar.config(command=self.__list_box.yview)
         self.__main_list = data_list
+        self.grid_columnconfigure(index=0, weight=1)
+        self.grid_rowconfigure(index=1, weight=1)
         self.update_list_box()
 
     def update_list_box(self, *args) -> None:
         """
         Update the displayed list based on what has been typed
         """
-        self.__list_box.selection_clear(0, tk.END)
+        self.__list_box.selection_clear(first=0, last=tk.END)
         search_term = self.__filter_box.get()
 
-        self.__list_box.delete(0, tk.END)
+        self.__list_box.delete(first=0, last=tk.END)
         self.__displayed_items_index.clear()
 
-        for index, item in enumerate(self.__main_list, start=0):
+        for index, item in enumerate(iterable=self.__main_list, start=0):
             if search_term.lower() in item.lower():
                 self.__list_box.insert(tk.END, item)
                 self.__displayed_items_index.append(index)
@@ -91,6 +94,13 @@ class MacFilterListBox(tk.Frame):
         """
         self.__bound_call_back = call_back
 
+    def set_main_list(self, new_list: list) -> None:
+        """
+        Update the main list
+        """
+        if new_list:
+            self.__main_list = new_list
+            self.update_list_box()
 
 if __name__ == "__main__":
     pass
