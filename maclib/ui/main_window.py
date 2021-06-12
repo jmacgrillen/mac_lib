@@ -14,6 +14,7 @@
 
 import tkinter as tk
 import tkinter.ttk as ttk
+from tkinter.constants import FLAT
 from maclib.ui.status_bar import MacStatusBar
 
 
@@ -61,7 +62,7 @@ class MacWindow(tk.Toplevel):
         """
         Most apps need a menu bar. May as well connect it to the window.
         """
-        self.menu_bar = tk.Menu(master=self.parent)
+        self.menu_bar = tk.Menu(master=self.parent, relief=FLAT)
         self.parent.configure(menu=self.menu_bar)
 
 

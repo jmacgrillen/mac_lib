@@ -22,7 +22,7 @@ class MacFilterListBox(tk.Frame):
     Create a list box with a filter box at the top.
     """
     __list_box:tk.Listbox
-    __filter_box:ttk.Entry
+    __filter_box:tk.Entry
     __scroll_bar:ttk.Scrollbar
     __main_list:list = []
     __filter_text:tk.StringVar
@@ -43,7 +43,10 @@ class MacFilterListBox(tk.Frame):
         self.grid_propagate(True)
         self.__filter_text = tk.StringVar()
         self.__filter_text.trace(mode="w", callback=self.update_list_box)
-        self.__filter_box = ttk.Entry(self, textvariable=self.__filter_text, width=width)
+        self.__filter_box = tk.Entry(self,
+                                     textvariable=self.__filter_text,
+                                     width=width,
+                                     relief=FLAT)
         self.__filter_box.grid(row=0, sticky='n')
         self.__list_box = tk.Listbox(self, width=width, relief=FLAT)
         self.__list_box.grid(row=1,column=0, sticky='ns')
