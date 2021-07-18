@@ -14,7 +14,7 @@
 """
 
 import platform
-
+import winreg
 
 class MacDetect(object):
     """
@@ -22,6 +22,7 @@ class MacDetect(object):
     """
     os_name: str
     os_version: str
+    os_theme: str
     architecture: str
     python_version: str
     python_compiler: str
@@ -38,3 +39,22 @@ class MacDetect(object):
         self.python_version = platform.python_version()
         self.python_compiler = platform.python_compiler()
         self.python_implementation = platform.python_implementation()
+        if self.os_name == "Windows":
+            self.detect_windows_theme()
+
+    def detect_windows_theme(self):
+        """
+        Check whether Windows is using dark  mode or not.
+        """
+        key = winreg.OpenKey(key=winreg.HKEY_CURRENT_USER,
+                             sub_key="Software\\Microsoft\\Windows\\"
+                                     "CurrentVersion\\Themes\\Personalize")
+        subkey = winreg.QueryValueEx(key, "AppsUseLightTheme")[0]
+        if subkey == 0:
+            self.os_theme = "Dark"
+        else:
+            self.os_theme ="Light"
+
+
+if __name__ == "__main__":
+    pass

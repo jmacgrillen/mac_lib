@@ -13,16 +13,15 @@
 """
 
 import tkinter as tk
-from tkinter.constants import FLAT
-import tkinter.ttk as ttk
+from tkinter import ttk
 import typing
 
 class MacFilterListBox(tk.Frame):
     """
     Create a list box with a filter box at the top.
     """
-    __list_box:tk.Listbox
-    __filter_box:tk.Entry
+    __list_box: ttk.Treeview    # tk.Listbox
+    __filter_box:ttk.Entry
     __scroll_bar:ttk.Scrollbar
     __main_list:list = []
     __filter_text:tk.StringVar
@@ -43,14 +42,14 @@ class MacFilterListBox(tk.Frame):
         self.grid_propagate(True)
         self.__filter_text = tk.StringVar()
         self.__filter_text.trace(mode="w", callback=self.update_list_box)
-        self.__filter_box = tk.Entry(self,
-                                     textvariable=self.__filter_text,
-                                     width=width,
-                                     relief=FLAT)
+        self.__filter_box = ttk.Entry(self,
+                                      textvariable=self.__filter_text,
+                                      width=width)
         self.__filter_box.grid(row=0, sticky='n')
-        self.__list_box = tk.Listbox(self, width=width, relief=FLAT)
+        self.__list_box = ttk.Treeview(master=self, show='tree', columns="1")
+        self.__list_box.column("#0",minwidth=width,width=width, stretch=False)
         self.__list_box.grid(row=1,column=0, sticky='ns')
-        self.__list_box.bind(sequence='<<ListboxSelect>>', func=self.on_select)
+        self.__list_box.bind(sequence='<ButtonRelease-1>', func=self.on_select)
         self.selected_value = ""
         self.selected_index = -1
         self.__scroll_bar = ttk.Scrollbar(self, orient='vertical')
@@ -66,31 +65,30 @@ class MacFilterListBox(tk.Frame):
         """
         Update the displayed list based on what has been typed
         """
-        self.__list_box.selection_clear(first=0, last=tk.END)
         search_term = self.__filter_box.get()
-
-        self.__list_box.delete(first=0, last=tk.END)
+        self.__list_box.delete(*self.__list_box.get_children())
         self.__displayed_items_index.clear()
 
         for index, item in enumerate(iterable=self.__main_list, start=0):
             if search_term.lower() in item.lower():
-                self.__list_box.insert(tk.END, item)
+                self.__list_box.insert(
+                    index=index,
+                    parent= '',
+                    text=item)
                 self.__displayed_items_index.append(index)
 
     def on_select(self, event:tk.Event) -> None:
         """
         Record the item that has been selected.
         """
-        event_widget = event.widget
-        self.selected_value = ""
-        self.selected_index = -1
-        if event_widget.curselection():
-            index = int(event_widget.curselection()[0])
-            self.selected_value = event_widget.get(index)
-            self.selected_index = self.__displayed_items_index[index]
-            if '_MacFilterListBox__bound_call_back' in vars(self):
-                self.__bound_call_back(selected_value=self.selected_value,
-                                       selected_index=self.selected_index)
+        iindex = event.widget.selection()
+        index = int(iindex[0][1:], 16)
+        self.selected_value = self.__list_box.item(iindex)['text']
+        self.selected_index = index
+        
+        if '_MacFilterListBox__bound_call_back' in vars(self):
+            self.__bound_call_back(selected_value=self.selected_value,
+                                   selected_index=self.selected_index)
 
     def bind(self, call_back:typing.Callable) -> None:
         """

@@ -13,8 +13,8 @@
 """
 
 import tkinter as tk
-from src.ui.main_window import MacWindow
-from src.ui.filter_list import MacFilterListBox
+from maclib.ui.main_window import MacWindow
+from maclib.ui.filter_list import MacFilterListBox
 
 def donothing():
    x = 0

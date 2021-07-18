@@ -13,7 +13,6 @@
 """
 
 import tkinter as tk
-from tkinter.constants import FLAT
 import tkinter.ttk as ttk
 
 class MacStatusBar(tk.Frame):
@@ -42,7 +41,6 @@ class MacStatusBar(tk.Frame):
         self.status_text.set(default_text)
         self.status_bar = ttk.Label(master=self,
                                     textvariable=self.status_text,
-                                    relief=FLAT,
                                     anchor=tk.W)
         self.status_bar.grid(row=1, column=0, sticky='we')
         self.size_grip = ttk.Sizegrip(self)
