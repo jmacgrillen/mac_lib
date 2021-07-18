@@ -15,18 +15,19 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 
+
 class MacStatusBar(tk.Frame):
     """
     tkInter statusbar for a window
     """
-    parent:ttk.Frame
-    status_bar:ttk.Label
-    size_grip:ttk.Sizegrip
-    status_text:tk.StringVar
+    parent: ttk.Frame
+    status_bar: ttk.Label
+    size_grip: ttk.Sizegrip
+    status_text: tk.StringVar
 
-    def __init__(self, 
-                 parent:ttk.Frame,
-                 default_text:str="Ready",
+    def __init__(self,
+                 parent: ttk.Frame,
+                 default_text: str = "Ready",
                  *args,
                  **kwargs):
         """
@@ -47,11 +48,12 @@ class MacStatusBar(tk.Frame):
         self.size_grip.grid(row=1, column=4, sticky='se')
         self.columnconfigure(0, weight=1)
 
-    def set_text(self, new_text:str):
+    def set_text(self, new_text: str) -> None:
         """
         Change the text on display on the status bar.
         """
         self.status_text.set(new_text)
+
 
 if __name__ == "__main__":
     pass

@@ -25,6 +25,7 @@ import time
 FORMAT_SYSLOG = 1
 FORMAT_JSON = 2
 
+
 def configure_logger(log_file_uri: str = None,
                      logging_level: int = logging.INFO,
                      use_stdout: bool = True,
@@ -50,20 +51,22 @@ def configure_logger(log_file_uri: str = None,
 
     if use_format is FORMAT_JSON:
         if use_utc:
-            format_config = "{ event_time : \"%(asctime)s.%(msecs)03dZ\", level :" \
-            " \"%(levelname)s\", function_name: \"%(module)s." \
-            "%(funcName)s\", message: \"%(message)s\" }"
+            format_config = "{ event_time : \"%(asctime)s.%(msecs)03dZ\"" \
+                            ",level : \"%(levelname)s\", function_name: \"" \
+                            "%(module)s.%(funcName)s\", message: \"" \
+                            "%(message)s\" }"
         else:
-            format_config = "{ event_time : \"%(asctime)s.%(msecs)03d\", level :" \
-            " \"%(levelname)s\", function_name: \"%(module)s." \
-            "%(funcName)s\", message: \"%(message)s\" }"
+            format_config = "{ event_time : \"%(asctime)s.%(msecs)03d\", " \
+                            "level : \"%(levelname)s\", function_name: \"" \
+                            " %(module)s.%(funcName)s\", message: \"" \
+                            "%(message)s\" }"
     else:
         if use_utc:
             format_config = "%(asctime)s.%(msecs)03dZ %(levelname)s " \
-            "%(module)s.%(funcName)s %(message)s"
+                            "%(module)s.%(funcName)s %(message)s"
         else:
             format_config = "%(asctime)s.%(msecs)03d %(levelname)s " \
-            "%(module)s.%(funcName)s %(message)s"
+                            "%(module)s.%(funcName)s %(message)s"
 
     date_config = "%Y-%m-%dT%H:%M:%S"
 
@@ -82,7 +85,7 @@ def configure_logger(log_file_uri: str = None,
             try:
                 os.makedirs(os.path.dirname(log_file_uri))
             except OSError as o_error:
-                print("Unable to create the logging directory " \
+                print("Unable to create the logging directory "
                       "{0}.\n{1}".format(os.path.dirname(log_file_uri),
                                          o_error.strerror))
                 sys.exit(1)

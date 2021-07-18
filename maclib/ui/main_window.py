@@ -19,20 +19,21 @@ from ttkthemes import ThemedStyle
 from maclib.ui.status_bar import MacStatusBar
 from maclib.mac_detect import MacDetect
 
+
 class MacWindow(tk.Toplevel):
     """
     Base window for mac_lib ui
     """
-    parent:tk.Tk
-    main_content:ttk.Frame
-    status_bar:MacStatusBar
-    menu_bar:tk.Menu
+    parent: tk.Tk
+    main_content: ttk.Frame
+    status_bar: MacStatusBar
+    menu_bar: tk.Menu
     mac_detect: MacDetect = MacDetect()
-    style: ThemedStyle 
+    style: ThemedStyle
 
-    def __init__(self, 
-                 parent:tk.Tk,
-                 window_icon:object=None,
+    def __init__(self,
+                 parent: tk.Tk,
+                 window_icon: object = None,
                  *args,
                  **kwargs):
         """
@@ -58,16 +59,18 @@ class MacWindow(tk.Toplevel):
         this_directory = os.path.dirname(this_file)
         if self.mac_detect.os_theme == "Dark":
             style = ThemedStyle(self.parent)
-            azure_dark_file = os.path.join(this_directory, "theme/azure-dark.tcl")
+            azure_dark_file = os.path.join(this_directory,
+                                           "theme/azure-dark.tcl")
             self.parent.tk.call("source", azure_dark_file)
             style.theme_use(theme_name="azure-dark")
         else:
             style = ThemedStyle(self.parent)
-            azure_file = os.path.join(this_directory, "theme/azure.tcl")
+            azure_file = os.path.join(this_directory,
+                                      "theme/azure.tcl")
             self.parent.tk.call("source", azure_file)
             style.theme_use(theme_name="azure")
 
-    def add_status_bar(self, default_text:str="Ready"):
+    def add_status_bar(self, default_text: str = "Ready"):
         """
         Add a status bar to the main window
         """
@@ -78,7 +81,7 @@ class MacWindow(tk.Toplevel):
         """
         Most apps need a menu bar. May as well connect it to the window.
         """
-        self.menu_bar = tk.Menu(master=self.parent) # , relief=FLAT)
+        self.menu_bar = tk.Menu(master=self.parent)
         self.parent.configure(menu=self.menu_bar)
 
 

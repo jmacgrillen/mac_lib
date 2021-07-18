@@ -12,12 +12,14 @@
         Copyright (c) John MacGrillen. All rights reserved.
 """
 
+
 def limit_number(num: int) -> int:
     """
     Limit the min and max of an int to a range of
     0 and 255.
     """
     return max(0, min(num, 255))
+
 
 def rgb2hex(red: int, green: int, blue: int) -> str:
     """
@@ -28,6 +30,7 @@ def rgb2hex(red: int, green: int, blue: int) -> str:
         limit_number(green),
         limit_number(blue)
     )
+
 
 if __name__ == "__main__":
     pass

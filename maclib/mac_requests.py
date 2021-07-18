@@ -56,7 +56,7 @@ class CERequests(object):
         """
         Send the request.
         """
-        response : requests.Response = requests.Response()
+        response: requests.Response = requests.Response()
 
         self.mac_logger.debug("Sending {0} request to {1}".format(
             http_action,

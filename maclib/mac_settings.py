@@ -24,14 +24,14 @@ class CESettingsFile(object):
     This is just a simple way of getting at those settings.
     """
 
-    mac_logger:logging.Logger = logging.getLogger("mac_logger")
-    settings_file_directory:str
-    settings_file_name:str
-    settings_file_full_path:str
-    settings:dict
-    able_to_update:bool
-    __instance:object
-    loaded_from_file:bool
+    mac_logger: logging.Logger = logging.getLogger("mac_logger")
+    settings_file_directory: str
+    settings_file_name: str
+    settings_file_full_path: str
+    settings: dict
+    able_to_update: bool
+    __instance: object
+    loaded_from_file: bool
 
     def __init__(self,
                  yaml_file_directory: str = None,
@@ -86,8 +86,8 @@ class CESettingsFile(object):
             self.mac_logger.info("Successfully loaded the settings.")
         except yaml.YAMLError as yaml_error:
             self.mac_logger.error("There was a problem parsing"
-                                 " the file %s.\n%s", self.settings_file_name,
-                                 yaml_error)
+                                  " the file %s.\n%s", self.settings_file_name,
+                                  yaml_error)
         self.loaded_from_file = True
         return self.settings
 

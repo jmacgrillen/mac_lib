@@ -16,6 +16,7 @@
 import platform
 import winreg
 
+
 class MacDetect(object):
     """
     Gather some information about the platform we're running on.
@@ -53,7 +54,7 @@ class MacDetect(object):
         if subkey == 0:
             self.os_theme = "Dark"
         else:
-            self.os_theme ="Light"
+            self.os_theme = "Light"
 
 
 if __name__ == "__main__":

@@ -16,24 +16,30 @@ import tkinter as tk
 from tkinter import ttk
 import typing
 
+
 class MacFilterListBox(tk.Frame):
     """
     Create a list box with a filter box at the top.
     """
     __list_box: ttk.Treeview    # tk.Listbox
-    __filter_box:ttk.Entry
-    __scroll_bar:ttk.Scrollbar
-    __main_list:list = []
-    __filter_text:tk.StringVar
-    __displayed_items_index:list = []
-    __bound_call_back:typing.Callable
+    __filter_box: ttk.Entry
+    __scroll_bar: ttk.Scrollbar
+    __main_list: list = []
+    __filter_text: tk.StringVar
+    __displayed_items_index: list = []
+    __bound_call_back: typing.Callable
     # Check these values to see what the user has selected.
-    # If the index is -1, and the value is an empty string, then 
+    # If the index is -1, and the value is an empty string, then
     # the user hasn't selected anything
-    selected_value:str
-    selected_index:int
+    selected_value: str
+    selected_index: int
 
-    def __init__(self, parent:tk.Misc, data_list:list, width:int=50, *args, **kwargs):
+    def __init__(self,
+                 parent: tk.Misc,
+                 data_list: list,
+                 width: int = 50,
+                 *args,
+                 **kwargs):
         """
         Create the filtered list box.
         """
@@ -47,13 +53,14 @@ class MacFilterListBox(tk.Frame):
                                       width=width)
         self.__filter_box.grid(row=0, sticky='n')
         self.__list_box = ttk.Treeview(master=self, show='tree', columns="1")
-        self.__list_box.column("#0",minwidth=width,width=width, stretch=False)
-        self.__list_box.grid(row=1,column=0, sticky='ns')
+        self.__list_box.column("#0", minwidth=width,
+                               width=width, stretch=False)
+        self.__list_box.grid(row=1, column=0, sticky='ns')
         self.__list_box.bind(sequence='<ButtonRelease-1>', func=self.on_select)
         self.selected_value = ""
         self.selected_index = -1
         self.__scroll_bar = ttk.Scrollbar(self, orient='vertical')
-        self.__scroll_bar.grid(row=1,column=1, sticky='ns')
+        self.__scroll_bar.grid(row=1, column=1, sticky='ns')
         self.__list_box.config(yscrollcommand=self.__scroll_bar.set)
         self.__scroll_bar.config(command=self.__list_box.yview)
         self.__main_list = data_list
@@ -73,11 +80,11 @@ class MacFilterListBox(tk.Frame):
             if search_term.lower() in item.lower():
                 self.__list_box.insert(
                     index=index,
-                    parent= '',
+                    parent='',
                     text=item)
                 self.__displayed_items_index.append(index)
 
-    def on_select(self, event:tk.Event) -> None:
+    def on_select(self, event: tk.Event) -> None:
         """
         Record the item that has been selected.
         """
@@ -85,12 +92,14 @@ class MacFilterListBox(tk.Frame):
         index = int(iindex[0][1:], 16)
         self.selected_value = str(event.widget.item(iindex)['text'])
         self.selected_index = index
-        
+
+        print(index)
+
         if '_MacFilterListBox__bound_call_back' in vars(self):
             self.__bound_call_back(selected_value=self.selected_value,
                                    selected_index=self.selected_index)
 
-    def bind(self, call_back:typing.Callable) -> None:
+    def bind(self, call_back: typing.Callable) -> None:
         """
         Store the callback function used when a selection has been made.
         """
@@ -103,6 +112,7 @@ class MacFilterListBox(tk.Frame):
         if new_list:
             self.__main_list = new_list
             self.update_list_box()
+
 
 if __name__ == "__main__":
     pass
