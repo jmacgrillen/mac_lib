@@ -28,6 +28,7 @@ FORMAT_JSON = 2
 
 def configure_logger(log_file_uri: str = None,
                      logging_level: int = logging.INFO,
+                     logger_name: str = "mac_logger",
                      use_stdout: bool = True,
                      use_utc: bool = True,
                      use_format: int = FORMAT_SYSLOG) -> logging.Logger:
@@ -76,7 +77,7 @@ def configure_logger(log_file_uri: str = None,
         )
     if use_utc:
         log_formatter.converter = time.gmtime
-    mac_logger = logging.getLogger(name='mac_logger')
+    mac_logger = logging.getLogger(name=logger_name)
 
     if log_file_uri:
         # Check the logging directory is available.
