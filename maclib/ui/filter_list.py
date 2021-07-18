@@ -83,7 +83,7 @@ class MacFilterListBox(tk.Frame):
         """
         iindex = event.widget.selection()
         index = int(iindex[0][1:], 16)
-        self.selected_value = self.__list_box.item(iindex)['text']
+        self.selected_value = str(event.widget.item(iindex)['text'])
         self.selected_index = index
         
         if '_MacFilterListBox__bound_call_back' in vars(self):
