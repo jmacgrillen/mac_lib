@@ -53,7 +53,7 @@ class MacFilterListBox(tk.Frame):
                                       width=width)
         self.__filter_box.grid(row=0, sticky='n')
         self.__list_box = ttk.Treeview(master=self, show='tree', columns="1")
-        self.__list_box.column("#0", minwidth=width,
+        self.__list_box.column("1", minwidth=width,
                                width=width, stretch=False)
         self.__list_box.grid(row=1, column=0, sticky='ns')
         self.__list_box.bind(sequence='<ButtonRelease-1>', func=self.on_select)
