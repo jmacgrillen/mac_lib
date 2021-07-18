@@ -58,12 +58,12 @@ class MacWindow(tk.Toplevel):
         this_directory = os.path.dirname(this_file)
         if self.mac_detect.os_theme == "Dark":
             style = ThemedStyle(self.parent)
-            azure_dark_file = os.path.join(this_directory, "azure-dark.tcl")
+            azure_dark_file = os.path.join(this_directory, "theme/azure-dark.tcl")
             self.parent.tk.call("source", azure_dark_file)
             style.theme_use(theme_name="azure-dark")
         else:
             style = ThemedStyle(self.parent)
-            azure_file = os.path.join(this_directory, "azure.tcl")
+            azure_file = os.path.join(this_directory, "theme/azure.tcl")
             self.parent.tk.call("source", azure_file)
             style.theme_use(theme_name="azure")
 

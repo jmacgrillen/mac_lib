@@ -16,8 +16,8 @@ import tkinter as tk
 from maclib.ui.main_window import MacWindow
 from maclib.ui.filter_list import MacFilterListBox
 
-def donothing():
-   x = 0
+def do_nothing():
+   pass
 
 def do_something(**kwargs):
     print(kwargs['selected_value'])
@@ -28,9 +28,9 @@ main_window = MacWindow(parent=main_app)
 main_window.add_status_bar("Ready Player 1")
 main_window.add_menu_bar()
 filemenu = tk.Menu(main_window.menu_bar, tearoff=0)
-filemenu.add_command(label="New", command=donothing)
-filemenu.add_command(label="Open", command=donothing)
-filemenu.add_command(label="Save", command=donothing)
+filemenu.add_command(label="New", command=do_nothing)
+filemenu.add_command(label="Open", command=do_nothing)
+filemenu.add_command(label="Save", command=do_nothing)
 filemenu.add_separator()
 filemenu.add_command(label="Exit", command=main_app.quit)
 main_window.menu_bar.add_cascade(label="File", menu=filemenu)
