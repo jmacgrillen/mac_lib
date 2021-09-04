@@ -18,7 +18,7 @@ from typing import Optional
 import maclib.mac_file_management as file_m
 
 
-class CESettingsFile(object):
+class MacSettingsFile(object):
     """
     cloudEngine uses YAML files for all configuration.
     This is just a simple way of getting at those settings.
@@ -39,6 +39,7 @@ class CESettingsFile(object):
         """
         Load the YAML file aready for use
         """
+        super(MacSettingsFile, self).__init__()
         if yaml_file_directory:
             self.settings_file_directory = yaml_file_directory
             if yaml_file:
@@ -54,7 +55,7 @@ class CESettingsFile(object):
         how many times the program calls for a new instance.
         """
         if not cls.__instance:
-            cls.__instance = super(CESettingsFile, cls).__new__(
+            cls.__instance = super(MacSettingsFile, cls).__new__(
                                 cls, *args, **kwargs)
         return cls.__instance
 

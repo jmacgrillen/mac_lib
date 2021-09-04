@@ -37,7 +37,7 @@ class MacWindow(tk.Toplevel):
                  *args,
                  **kwargs):
         """
-        Create a tk window
+        Create a tk toplevel window
         """
         super(MacWindow, self).__init__(*args, **kwargs)
         self.parent = parent
