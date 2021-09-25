@@ -112,3 +112,7 @@ def configure_logger(log_file_uri: str = None,
         mac_logger.addHandler(hdlr=log_std_out)
     mac_logger.setLevel(level=logging_level)
     return mac_logger
+
+
+if __name__ == "__main__":
+    pass

@@ -73,3 +73,7 @@ class CERequests(object):
             self.mac_logger.error("Request error {0}".format(e))
 
         return response
+
+
+if __name__ == "__main__":
+    pass

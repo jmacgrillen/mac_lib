@@ -29,3 +29,7 @@ class MacException(Exception):
         str_message = "Exception - {0}".format(str_message)
         m_logger.error(str_message)
         super(MacException, self).__init__(str_message)
+
+
+if __name__ == "__main__":
+    pass

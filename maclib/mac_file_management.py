@@ -88,3 +88,7 @@ def create_dir(dir_path: str) -> bool:
     else:
         file_logging.info("Directory {0} already exists.".format(dir_path))
     return False
+
+
+if __name__ == "__main__":
+    pass

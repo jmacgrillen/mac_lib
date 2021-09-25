@@ -77,3 +77,7 @@ class MacSingleDictionary(MacSingleInstance):
         except AttributeError as a_error:
             print(a_error)
             return None
+
+
+if __name__ == "__main__":
+    pass
