@@ -13,6 +13,7 @@
 """
 
 import logging
+import maclib.mac_logger as mac_logger
 
 
 class MacException(Exception):
@@ -24,7 +25,7 @@ class MacException(Exception):
         """
         Raise the exception just like normal.
         """
-        m_logger = logging.getLogger("mac_logger")
+        m_logger = logging.getLogger(mac_logger.LOGGER_NAME)
         str_message = "Exception - {0}".format(str_message)
         m_logger.error(str_message)
         super(MacException, self).__init__(str_message)

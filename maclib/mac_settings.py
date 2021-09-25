@@ -1,9 +1,10 @@
 #! /usr/bin/env python -*- coding: utf-8 -*-
 """
     Name:
-        ce_settings.py
+        mac_settings.py
     Desscription:
-        The Code Express settinsg file manager.
+        Manage application settings. This uses the singleton
+        pattern to make sure the setting persist in all modules.
     Version:
         1 - Inital release
     Author:
@@ -16,21 +17,21 @@ import logging
 import yaml
 from typing import Optional
 import maclib.mac_file_management as file_m
+from maclib.mac_single import MacSingleDictionary
+import maclib.mac_logger as mac_logger
 
 
-class MacSettingsFile(object):
+class MacSettingsFile(MacSingleDictionary):
     """
     cloudEngine uses YAML files for all configuration.
     This is just a simple way of getting at those settings.
     """
 
-    mac_logger: logging.Logger = logging.getLogger("mac_logger")
+    mac_logger: logging.Logger
     settings_file_directory: str
     settings_file_name: str
     settings_file_full_path: str
-    settings: dict
     able_to_update: bool
-    __instance: object
     loaded_from_file: bool
 
     def __init__(self,
@@ -40,6 +41,7 @@ class MacSettingsFile(object):
         Load the YAML file aready for use
         """
         super(MacSettingsFile, self).__init__()
+        self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
         if yaml_file_directory:
             self.settings_file_directory = yaml_file_directory
             if yaml_file:
@@ -47,17 +49,6 @@ class MacSettingsFile(object):
             self.settings_file_full_path = "{0}/{1}".format(
                                         yaml_file_directory,
                                         yaml_file)
-
-    def __new__(cls, *args, **kwargs):
-        """
-        This class is following the Singleton pattern, a class that
-        is a single instance that persists across all modules no matter
-        how many times the program calls for a new instance.
-        """
-        if not cls.__instance:
-            cls.__instance = super(MacSettingsFile, cls).__new__(
-                                cls, *args, **kwargs)
-        return cls.__instance
 
     def load_settings(self) -> Optional[dict]:
         """
@@ -78,19 +69,18 @@ class MacSettingsFile(object):
                     return None
                 else:
                     self.save_settings()
-
-        # Read the yaml file.
+        # Read the settings from a YAML file.
         try:
             with open(file=self.settings_file_full_path,
                       mode='rb') as yml_file:
-                self.settings = yaml.safe_load(stream=yml_file)
+                self.data_dictionary = yaml.safe_load(stream=yml_file)
             self.mac_logger.info("Successfully loaded the settings.")
         except yaml.YAMLError as yaml_error:
             self.mac_logger.error("There was a problem parsing"
                                   " the file %s.\n%s", self.settings_file_name,
                                   yaml_error)
         self.loaded_from_file = True
-        return self.settings
+        return self.data_dictionary
 
     def save_settings(self) -> None:
         """
@@ -103,43 +93,12 @@ class MacSettingsFile(object):
             with open(file=self.settings_file_full_path,
                       mode='w',) as yml_file:
                 self.mac_logger.debug(
-                    yaml.dump(data=self.settings, indent=4))
-                yaml.dump(data=self.settings,
+                    yaml.dump(data=self.data_dictionary, indent=4))
+                yaml.dump(data=self.data_dictionary,
                           stream=yml_file,)
             self.mac_logger.debug("Successfully saved settings.")
         except Exception as err:
             self.mac_logger.error("Unable to save settings. {0}", err)
-
-    def does_key_exist(self, key_name: str) -> bool:
-        """
-        Check whether the file contains the requested key.
-        """
-        if key_name not in self.settings:
-            return False
-        return True
-
-    def __setitem__(self, setting_key: str, settings_value) -> None:
-        """
-        Update the settings.
-        """
-        self.mac_logger.info("Saving setting {0}.".format(setting_key))
-        self.settings[setting_key] = settings_value
-        self.save_settings()
-
-    def __getitem__(self, key: str) -> Optional[str]:
-        """
-        When requested return the value of a particular key.
-        """
-        if not self.settings:
-            self.mac_logger.error(
-                "No settings are available.")
-            return None
-        try:
-            setting = self.settings[key]
-        except AttributeError as a_error:
-            self.mac_logger.error(a_error)
-            return None
-        return setting
 
 
 if __name__ == "__main__":

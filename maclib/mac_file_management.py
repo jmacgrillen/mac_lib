@@ -15,9 +15,10 @@
 import os
 from pathlib import Path
 import logging
+import maclib.mac_logger as mac_logger
 
 
-file_logging: logging.Logger = logging.getLogger("mac_logger")
+file_logging: logging.Logger = logging.getLogger(mac_logger.LOGGER_NAME)
 
 
 def does_exist(os_path: str) -> bool:

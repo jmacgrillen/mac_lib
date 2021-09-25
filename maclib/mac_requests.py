@@ -14,6 +14,7 @@
 
 import logging
 import requests
+import maclib.mac_logger as mac_logger
 
 
 class CERequests(object):
@@ -30,7 +31,7 @@ class CERequests(object):
         Class initialisation
         """
         super(CERequests, self).__init__()
-        self.mac_logger = logging.getLogger("mac_logger")
+        self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
 
     def set_all_headers(self, headers: dict) -> None:
         """

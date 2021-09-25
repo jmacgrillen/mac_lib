@@ -21,14 +21,18 @@ import sys
 import logging
 import logging.handlers
 import time
+import inspect
+from pathlib import Path
 
 FORMAT_SYSLOG = 1
 FORMAT_JSON = 2
 
+LOGGER_NAME = Path(inspect.stack()[-1][1]).stem
+
 
 def configure_logger(log_file_uri: str = None,
                      logging_level: int = logging.INFO,
-                     logger_name: str = "mac_logger",
+                     logger_name: str = LOGGER_NAME,
                      use_stdout: bool = True,
                      use_utc: bool = True,
                      use_format: int = FORMAT_SYSLOG) -> logging.Logger:
@@ -38,6 +42,8 @@ def configure_logger(log_file_uri: str = None,
     :arg log_file_uri: Where we want to make our log file
     :arg logging_level: What level do we want to start logging at?
                         Default is set to INFO
+    :arg logger_name: Set the logger name. The default will be the name of the
+                      process. It can overridden here, but wn't be persistent.
     :arg use_stdout: Flag to show whether to output to stdout or not.
     :arg use_utc: Log timestamp will use UTC. False by default
     :arg use_format: Format the output as SYSLOG or JSON. Default is SYSLOG.
