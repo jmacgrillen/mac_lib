@@ -18,8 +18,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 install_requirements = [
-    "PyYaml",
-    "ttkthemes"
+    "PyYaml"
 ]
 
 def setup_maclib_package() -> None:
