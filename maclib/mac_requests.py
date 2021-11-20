@@ -44,10 +44,7 @@ class CERequests(object):
         """
         Add or update a particular header value.
         """
-        self.mac_logger.debug("Setting header {0} to {1}".format(
-            header_key,
-            header_value
-        ))
+        self.mac_logger.debug(f"Setting header {header_key} to {header_value}")
         self.http_headers[header_key] = header_value
 
     def send_request(self,
@@ -59,10 +56,7 @@ class CERequests(object):
         """
         response: requests.Response = requests.Response()
 
-        self.mac_logger.debug("Sending {0} request to {1}".format(
-            http_action,
-            http_url
-        ))
+        self.mac_logger.debug(f"Sending {http_action} request to {http_url}")
         try:
             response = requests.request(
                             method=http_action,
@@ -70,7 +64,7 @@ class CERequests(object):
                             headers=self.http_headers
                         )
         except requests.exceptions.RequestException as e:
-            self.mac_logger.error("Request error {0}".format(e))
+            self.mac_logger.error(f"Request error {e}")
 
         return response
 

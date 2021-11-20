@@ -43,7 +43,7 @@ class MacDetect(object):
         if self.os_name == "Windows":
             self.detect_windows_theme()
 
-    def detect_windows_theme(self):
+    def detect_windows_theme(self) -> str:
         """
         Check whether Windows is using dark  mode or not.
         """

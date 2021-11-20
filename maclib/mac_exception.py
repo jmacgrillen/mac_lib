@@ -21,12 +21,12 @@ class MacException(Exception):
     Base exception class for mac_lib. Pushes out
     exceptions to the log file.
     """
-    def __init__(self, str_message):
+    def __init__(self, str_message: str):
         """
         Raise the exception just like normal.
         """
         m_logger = logging.getLogger(mac_logger.LOGGER_NAME)
-        str_message = "Exception - {0}".format(str_message)
+        str_message = "Exception - {str_message}"
         m_logger.error(str_message)
         super(MacException, self).__init__(str_message)
 

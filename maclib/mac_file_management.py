@@ -59,12 +59,10 @@ def delete_file(os_path: str) -> bool:
         try:
             os.remove(os_path)
         except OSError as e:
-            file_logging.error("Could not delete file {0}. {1}".format(
-                os_path, e))
+            file_logging.error(f"Could not delete file {os_path}. {e}")
             return False
     else:
-        file_logging.info("Unable to delete {0} as it does not exist.".format(
-            os_path))
+        file_logging.info(f"Unable to delete {os_path} as it does not exist.")
     return True
 
 
@@ -82,11 +80,11 @@ def create_dir(dir_path: str) -> bool:
                 return False
         else:
             err_msg = "Do not have permssions to create directory " \
-                      "under {0}".format(get_parent_dir(dir_path))
+                      f"under {get_parent_dir(dir_path)}"
             file_logging.error(err_msg)
             return False
     else:
-        file_logging.info("Directory {0} already exists.".format(dir_path))
+        file_logging.info(f"Directory {dir_path} already exists.")
     return False
 
 
