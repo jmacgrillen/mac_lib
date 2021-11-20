@@ -93,8 +93,7 @@ def configure_logger(log_file_uri: str = None,
                 os.makedirs(os.path.dirname(log_file_uri))
             except OSError as o_error:
                 print("Unable to create the logging directory "
-                      "{0}.\n{1}".format(os.path.dirname(log_file_uri),
-                                         o_error.strerror))
+                      f"{os.path.dirname(log_file_uri)}.\n{o_error.strerror}")
                 sys.exit(1)
         log_file_handler = logging.handlers.RotatingFileHandler(
             filename=log_file_uri,
