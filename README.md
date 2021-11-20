@@ -4,4 +4,4 @@
 
 mac_lib is a collection of handy Python boiler plate code snippets.
 
-These are dsigned to help *me* accelerate creating Python programs with out-of-the-box support for logging, settingss files, etc. plus some code to accelerate building a UI using the built in Tkinter package.
+These are dsigned to help *me* accelerate creating Python programs with out-of-the-box support for logging, settingss files, etc.
