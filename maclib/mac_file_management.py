@@ -54,16 +54,15 @@ def delete_file(os_path: str) -> bool:
     Delete the selected file.
     """
     if does_exist(os_path):
-        file_logging.info("Deleting file {0}".format(
-            os_path))
+        file_logging.info(f"Deleting file {os_path}")
         try:
             os.remove(os_path)
+            return True
         except OSError as e:
             file_logging.error(f"Could not delete file {os_path}. {e}")
-            return False
     else:
         file_logging.info(f"Unable to delete {os_path} as it does not exist.")
-    return True
+    return False
 
 
 def create_dir(dir_path: str) -> bool:
