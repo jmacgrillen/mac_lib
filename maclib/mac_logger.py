@@ -113,5 +113,5 @@ def configure_logger(log_file_uri: str = None,
     return mac_logger
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pass

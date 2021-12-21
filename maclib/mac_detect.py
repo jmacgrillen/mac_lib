@@ -57,5 +57,5 @@ class MacDetect(object):
             self.os_theme = "Light"
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pass

@@ -28,5 +28,5 @@ class MacSingleInstance(type):
         return cls._instances[cls]
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pass

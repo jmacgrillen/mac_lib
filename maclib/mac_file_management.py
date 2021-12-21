@@ -78,6 +78,7 @@ def create_dir(dir_path: str) -> bool:
                 file_logging.error("Unable to create the directory")
                 return False
         else:
+            print("permission error")
             err_msg = "Do not have permssions to create directory " \
                       f"under {get_parent_dir(dir_path)}"
             file_logging.error(err_msg)
@@ -87,5 +88,5 @@ def create_dir(dir_path: str) -> bool:
     return False
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pass

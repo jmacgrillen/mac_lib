@@ -19,8 +19,7 @@ with open("README.md", "r") as fh:
 
 install_requirements = [
     "PyYaml",
-    "requests",
-    "pytest"
+    "requests"
 ]
 
 

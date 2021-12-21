@@ -32,5 +32,5 @@ def rgb2hex(red: int, green: int, blue: int) -> str:
     )
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pass

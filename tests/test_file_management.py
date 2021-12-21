@@ -146,9 +146,130 @@ def test_fm_08_parent_dir_file_name_only():
         assert fm.get_parent_dir(test_path)
 
 
-def test_fm_09_delete_file_true():
+def test_fm_09_delete_file_true(tmp_path):
     """
     Test the delete function
     """
-    test_path = 'PYTEST_TMPDIR/testfile.txt'
-    assert fm.delete_file(test_path) is True
+    temp_path = tmp_path / "test.txt"
+    with open(temp_path, 'w') as file_p:
+        file_p.write('Test\n')
+    assert fm.delete_file(temp_path) is True
+
+
+def test_fm_10_delete_file_no_file():
+    """
+    Test what happens when delete fails
+    """
+    assert fm.delete_file("nofile.txt") is False
+
+
+def test_fm_11_delete_file_failed(monkeypatch):
+    """
+    Test that OSError is handled
+    """
+    test_file_name = "nofile.txt"
+
+    def does_exist_true(os_path: str):
+        """
+        Make sure we get a True returned.
+        """
+        assert os_path == test_file_name
+        return True
+
+    def remove_response(os_path: str):
+        """
+        Make sure that OSError is raised
+        """
+        assert os_path == test_file_name
+        raise OSError("This is a test.")
+
+    monkeypatch.setattr(fm, 'does_exist', does_exist_true)
+    monkeypatch.setattr(os, 'remove', remove_response)
+    assert fm.delete_file(test_file_name) is False
+
+
+def test_fm_12_create_dir(tmp_path):
+    """
+    Test that does_exist is being properly invoked.
+    """
+    test_dir_name = tmp_path / "mytest"
+    assert fm.create_dir(test_dir_name) is True
+
+
+def test_fm_12_create_dir_already_exists(monkeypatch):
+    """
+    Test that does_exist is being properly invoked.
+    """
+    test_dir_name = "test_dir/mytest"
+
+    def does_exist_true(dir_name: str):
+        """
+        Return True to test the creation fails.
+        """
+        assert dir_name == test_dir_name
+        return True
+
+    monkeypatch.setattr(fm, 'does_exist', does_exist_true)
+    assert fm.create_dir(test_dir_name) is False
+
+
+def test_fm_12_create_dir_cant_write(monkeypatch):
+    """
+    Test that does_exist is being properly invoked.
+    """
+    test_dir_name = "/home/test_dir/mytest"
+
+    def does_exist_false(dir_name: str):
+        """
+        Return True to test the creation fails.
+        """
+        assert dir_name == test_dir_name
+        return False
+
+    def can_write_false(dir_name: str):
+        """
+        Return True to test the creation fails.
+        """
+        assert dir_name == "\\home"
+        return False
+
+    monkeypatch.setattr(fm, 'does_exist', does_exist_false)
+    monkeypatch.setattr(fm, 'can_write_to', can_write_false)
+    assert fm.create_dir(test_dir_name) is False
+
+
+def test_fm_12_create_dir_exception(monkeypatch):
+    """
+    Test that does_exist is being properly invoked.
+    """
+    test_dir_name = "/home/test_dir/mytest"
+
+    def does_exist_false(dir_name: str):
+        """
+        Return True to test the creation fails.
+        """
+        assert dir_name == test_dir_name
+        return False
+
+    def can_write_true(dir_name: str):
+        """
+        Return True to test the creation fails.
+        """
+        assert dir_name == "\\home"
+        return True
+
+    def makedirs_exception(name: str):
+        """
+        Raise an OSError to make sure it's handled
+        """
+        assert name == test_dir_name
+        raise OSError("Test Exception")
+
+    monkeypatch.setattr(fm, 'does_exist', does_exist_false)
+    monkeypatch.setattr(fm, 'can_write_to', can_write_true)
+    monkeypatch.setattr(os, 'makedirs', makedirs_exception)
+    assert fm.create_dir(test_dir_name) is False
+
+
+if __name__ == "__main__":
+    pass

@@ -31,5 +31,5 @@ class MacException(Exception):
         super(MacException, self).__init__(str_message)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pass
