@@ -26,7 +26,7 @@ class MacException(Exception):
         Raise the exception just like normal.
         """
         m_logger = logging.getLogger(mac_logger.LOGGER_NAME)
-        str_message = "Exception - {str_message}"
+        str_message = f"Exception - {str_message}"
         m_logger.error(str_message)
         super(MacException, self).__init__(str_message)
 

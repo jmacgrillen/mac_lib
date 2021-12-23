@@ -57,12 +57,12 @@ def configure_logger(log_file_uri: str = None,
     date_config: str
 
     if use_format is FORMAT_JSON:
-        if use_utc:
+        if use_utc is True:
             format_config = "{ event_time : \"%(asctime)s.%(msecs)03dZ\"" \
                             ",level : \"%(levelname)s\", function_name: \"" \
                             "%(module)s.%(funcName)s\", message: \"" \
                             "%(message)s\" }"
-        else:
+        elif use_utc is False:
             format_config = "{ event_time : \"%(asctime)s.%(msecs)03d\", " \
                             "level : \"%(levelname)s\", function_name: \"" \
                             " %(module)s.%(funcName)s\", message: \"" \
@@ -75,6 +75,7 @@ def configure_logger(log_file_uri: str = None,
             format_config = "%(asctime)s.%(msecs)03d %(levelname)s " \
                             "%(module)s.%(funcName)s %(message)s"
 
+    # ISO8601 Time format
     date_config = "%Y-%m-%dT%H:%M:%S"
 
     log_formatter = logging.Formatter(
