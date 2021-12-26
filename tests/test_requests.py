@@ -11,8 +11,10 @@
     Copyright:
         Copyright (c) John MacGrillen. All rights reserved.
 """
-
-import maclib.mac_requests as requests
+import maclib.mac_requests as mac_requests
+import json
+import responses
+import requests
 
 
 class TestRequests():
@@ -20,7 +22,7 @@ class TestRequests():
     Test the mac_requests class
     """
 
-    m_requests: requests.MacRequests = requests.MacRequests()
+    m_requests: mac_requests.MacRequests = mac_requests.MacRequests()
     test_headers: dict = {
         "Connection": "Keep-Alive",
         "Accept-Encoding": "gzip",
@@ -49,8 +51,57 @@ class TestRequests():
 
         assert self.m_requests.http_headers['Accept-Language'] == "en-GB"
 
-    def test_03_send_request(self, monkeypatch):
+    @responses.activate
+    def test_03_send_request(self):
         """
         Mock the request/response
         """
-        
+        return_code = 200
+        test_url = "https://www.madethisup.test/"
+
+        test_body = {
+            'id': 'test1',
+            'name': 'Test1',
+            'description': 'This is a Test',
+            'imageUrl': './my_image.jpg'
+        }
+
+        responses.add(
+            responses.Response(
+                method='GET',
+                url=test_url,
+                body=json.dumps(test_body),
+                headers=self.m_requests.http_headers,
+                content_type='application/json',
+                status=return_code)
+        )
+
+        response = self.m_requests.send_request('GET',
+                                                test_url)
+
+        assert len(responses.calls) == 1
+        assert responses.calls[0].request.url == test_url
+        assert response.status_code == return_code
+        assert response.text == json.dumps(test_body)
+
+    def test_04_send_exception(self, monkeypatch):
+        """
+        Test that the exception is caught
+        """
+        test_url = "https://www.madethisup.test/"
+        http_method = 'GET'
+
+        def raise_exception(method: str,
+                            url: str,
+                            headers):
+            """
+            Make sure the request raises an exception
+            """
+            assert method == http_method
+            assert url == test_url
+            assert headers == self.m_requests.http_headers
+            raise requests.exceptions.RequestException("Test message")
+
+        monkeypatch.setattr(requests, 'request', raise_exception)
+        response = self.m_requests.send_request(http_method, test_url)
+        assert response.request is None
