@@ -17,6 +17,8 @@ import platform
 import sys
 if 'nt' in sys.builtin_module_names:
     import winreg
+else:
+    import fake_winreg as winreg
 
 
 class MacDetect(object):
