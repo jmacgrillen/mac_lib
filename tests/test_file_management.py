@@ -255,7 +255,7 @@ def test_fm_12_create_dir_exception(monkeypatch):
         """
         Return True to test the creation fails.
         """
-        assert dir_name == "\\home"
+        assert Path(dir_name) == Path('/home')
         return True
 
     def makedirs_exception(name: str):
