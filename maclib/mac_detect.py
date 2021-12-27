@@ -18,7 +18,7 @@ import sys
 if 'nt' in sys.builtin_module_names:  # pragma: no cover
     import winreg
 else:
-    import fake_winreg as winreg
+    import fake_winreg as winreg  # type: ignore
 
 
 class MacDetect(object):
