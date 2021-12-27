@@ -14,7 +14,9 @@
 """
 
 import platform
-import winreg
+import sys
+if 'nt' in sys.builtin_module_names:
+    import winreg
 
 
 class MacDetect(object):
