@@ -15,7 +15,7 @@
 
 import platform
 import sys
-if 'nt' in sys.builtin_module_names:
+if 'nt' in sys.builtin_module_names:  # pragma: no cover
     import winreg
 else:
     import fake_winreg as winreg

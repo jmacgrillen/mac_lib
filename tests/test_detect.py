@@ -13,11 +13,11 @@
 """
 import platform
 import sys
+import maclib.mac_detect as mdetect
 if 'nt' in sys.builtin_module_names:
     import winreg
 else:
     import fake_winreg as winreg
-import maclib.mac_detect as mdetect
 
 
 def test_detect_01_test_platform_not_windows(monkeypatch):
