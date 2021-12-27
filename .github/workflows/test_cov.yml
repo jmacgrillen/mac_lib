@@ -25,6 +25,6 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
-          pip install pytest pytest-cov responses
+          pip install pytest pytest-cov responses fake-winreg
           export PYTHONPATH=$GITHUB_WORKSPACE
           pytest --cov=maclib  tests --cov-fail-under=100
