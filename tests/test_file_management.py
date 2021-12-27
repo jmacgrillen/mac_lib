@@ -217,7 +217,7 @@ def test_fm_12_create_dir_cant_write(monkeypatch):
     """
     Test that does_exist is being properly invoked.
     """
-    test_dir_name = "/home/test_dir/mytest"
+    test_dir_name = "/home/test_dir/test_dir_name"
 
     def does_exist_false(dir_name: str):
         """
@@ -230,7 +230,7 @@ def test_fm_12_create_dir_cant_write(monkeypatch):
         """
         Return True to test the creation fails.
         """
-        assert dir_name == "\\home"
+        assert Path(dir_name) == Path('/home')
         return False
 
     monkeypatch.setattr(fm, 'does_exist', does_exist_false)
