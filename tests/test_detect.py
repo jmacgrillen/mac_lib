@@ -12,7 +12,7 @@
         Copyright (c) John MacGrillen. All rights reserved.
 """
 import platform
-import fake-winreg as winreg
+import fake_winreg as winreg
 import maclib.mac_detect as mdetect
 
 
