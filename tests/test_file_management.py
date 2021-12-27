@@ -21,14 +21,14 @@ def test_fm_01_exists_true(monkeypatch):
     """
     Test the does_exist function returns true
     """
-    fake_path = "\\test"
+    fake_path = "test"
 
     def mock_exists(faked_exist):
         """
         Check the path is being passed correctly and
         return true.
         """
-        assert f"\\{faked_exist.name}" == fake_path
+        assert f"{faked_exist.name}" == fake_path
         return True
 
     monkeypatch.setattr(Path, "exists", mock_exists)
@@ -39,14 +39,14 @@ def test_fm_02_exists_false(monkeypatch):
     """
     Test the does_exist function returns false
     """
-    fake_path = "\\test"
+    fake_path = "test"
 
     def mock_exists(faked_exist):
         """
         Check the path is being passed correctly and
         return false.
         """
-        assert f"\\{faked_exist.name}" == fake_path
+        assert f"{faked_exist.name}" == fake_path
         return False
 
     monkeypatch.setattr(Path, "exists", mock_exists)
@@ -57,7 +57,7 @@ def test_fm_03_can_read_true(monkeypatch):
     """
     Test the can read function returns true
     """
-    fake_path = "\\test"
+    fake_path = "test"
 
     def mock_access(path, mode):
         """
@@ -76,7 +76,7 @@ def test_fm_04_can_read_false(monkeypatch):
     """
     Test the can read function returns false
     """
-    fake_path = "\\test"
+    fake_path = "test"
 
     def mock_access(path, mode):
         """
@@ -95,7 +95,7 @@ def test_fm_05_can_write_true(monkeypatch):
     """
     Test the can write function returns true
     """
-    fake_path = "\\test"
+    fake_path = "test"
 
     def mock_access(path, mode):
         """
@@ -114,7 +114,7 @@ def test_fm_06_can_write_false(monkeypatch):
     """
     Test the can write function returns false
     """
-    fake_path = "\\test"
+    fake_path = "test"
 
     def mock_access(path, mode):
         """
