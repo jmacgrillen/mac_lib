@@ -16,9 +16,18 @@ import os
 from pathlib import Path
 import logging
 import maclib.mac_logger as mac_logger
+from maclib.mac_exception import MacException
 
 
 file_logging: logging.Logger = logging.getLogger(mac_logger.LOGGER_NAME)
+
+
+class FileDoesNotExistException(MacException):
+    """
+    As file does not exist is a useful exception lets create
+    a resusable one here.
+    """
+    pass
 
 
 def does_exist(os_path: str) -> bool:
