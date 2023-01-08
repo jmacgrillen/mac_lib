@@ -100,11 +100,10 @@ class MacSpinner(object):
         """
         self.message = new_message
 
-    def kill_handler(self, signum, frame) -> None:
+    def kill_handler(self, signum: int, frame: any) -> None:
         """
         Capture CTRL+C and kill the animation
         """
-        print(type(signum))
         self.stop()
         time.sleep(1)
         self.clear_line()

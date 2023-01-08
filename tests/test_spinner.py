@@ -71,7 +71,7 @@ class TestSpinner():
         assert mspinner.event_stop.is_set()
 
     def test_06_animation_loop(self):
-        """"
+        """
         Test the animation loop resets.
         """
         mspinner: spinner.MacSpinner = spinner.MacSpinner()
@@ -79,3 +79,11 @@ class TestSpinner():
         mspinner._render()
         print(len(mspinner.frames))
         assert mspinner.current_frame == 1
+
+    def test_07_kill_spinner(self):
+        """
+        Test the kill handler code works
+        """
+        mspinner: spinner.MacSpinner = spinner.MacSpinner()
+        mspinner.start()
+        mspinner.kill_handler(1, 1)
