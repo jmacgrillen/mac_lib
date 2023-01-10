@@ -1,0 +1,12 @@
+uhd-server:
+  log_level: DEBUG
+  cache_age: 24
+plugins:
+  - name:
+      - value: sky_news
+    active:
+      - value: true
+  - name: 
+      - value: time
+    active:
+      - value: true
