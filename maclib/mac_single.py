@@ -11,6 +11,7 @@
     Copyright:
         Copyright (c) John MacGrillen. All rights reserved.
 """
+from weakref import WeakValueDictionary
 
 
 class MacSingleInstance(type):
@@ -19,12 +20,13 @@ class MacSingleInstance(type):
     is a single instance that persists across all modules no matter
     how many times the program calls for a new instance.
     """
-    _instances = {}
+    _instances = WeakValueDictionary()
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(
+            instance = cls._instances[cls] = super(
                 MacSingleInstance, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = instance
         return cls._instances[cls]
 
 

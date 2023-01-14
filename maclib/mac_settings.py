@@ -20,10 +20,10 @@ import yaml
 import shutil
 import pathlib
 from threading import Lock
-import mac_file_management as file_m
-import mac_logger as mac_logger
-from mac_single import MacSingleInstance
-from mac_exception import MacException
+import maclib.mac_file_management as file_m
+import maclib.mac_logger as mac_logger
+from maclib.mac_single import MacSingleInstance
+from maclib.mac_exception import MacException
 
 
 class MacSettingsException(MacException):

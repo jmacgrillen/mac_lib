@@ -87,3 +87,7 @@ class TestSpinner():
         mspinner: spinner.MacSpinner = spinner.MacSpinner()
         mspinner.start()
         mspinner.kill_handler(1, 1)
+
+
+if __name__ == "__main__":  # pragma: no cover
+    pass
