@@ -62,7 +62,7 @@ class MacSettings(metaclass=MacSingleInstance):
             self.mac_logger.info(
                 f"The settings file {self.settings_file_path} does "
                 "not exist. Creating a new one...")
-            self.__copy_default_settings()
+            self._copy_default_settings()
 
     def load_settings(self) -> Optional[dict]:
         """
@@ -76,9 +76,10 @@ class MacSettings(metaclass=MacSingleInstance):
                     self.__app_settings = yaml.safe_load(stream=yml_file)
             self.mac_logger.info("Successfully loaded the settings.")
         except yaml.YAMLError as yaml_error:
-            self.mac_logger.error("There was a problem parsing"
-                                  " the file %s.\n%s", self.settings_file,
-                                  yaml_error)
+            raise MacSettingsException(
+                "There was a problem parsing"
+                f" the file {self.settings_file_path}"
+                f" {yaml_error}")
         return self.__app_settings
 
     def __getitem__(self, keys: any) -> any:
@@ -170,7 +171,7 @@ class MacSettings(metaclass=MacSingleInstance):
         except Exception as err:
             self.mac_logger.error(f"Unable to save settings. {err}")
 
-    def __copy_default_settings(self) -> None:
+    def _copy_default_settings(self) -> None:
         """
         Copy the default settings file into the correct position. If this
         fails we want the exception to break the program flow, so don't try
