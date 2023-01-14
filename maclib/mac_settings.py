@@ -14,11 +14,11 @@
 """
 from typing import Optional
 from functools import reduce
+import operator
 import logging
 import yaml
 import shutil
 import pathlib
-import collections
 from threading import Lock
 import mac_file_management as file_m
 import mac_logger as mac_logger
@@ -33,7 +33,7 @@ class MacSettingsException(MacException):
     pass
 
 
-class MacSettings(object, metaclass=MacSingleInstance):
+class MacSettings(metaclass=MacSingleInstance):
     """
     Handle global apps setting using a singleton class.
     Make sure the logger is initialised before calling this class.
@@ -42,7 +42,7 @@ class MacSettings(object, metaclass=MacSingleInstance):
     settings_file_path: str
     default_settings_path: str
     __app_settings: dict
-    thread_lock: Lock
+    __thread_lock: Lock
 
     def __init__(self,
                  settings_file_path: str,
@@ -52,7 +52,7 @@ class MacSettings(object, metaclass=MacSingleInstance):
         self.default_settings_path = default_settings_path
         self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
         self.__app_settings = dict()
-        self.thread_lock = Lock()
+        self.__thread_lock = Lock()
         if not file_m.does_exist(os_path=default_settings_path):
             raise MacSettingsException(
                 "The default settings file "
@@ -63,7 +63,6 @@ class MacSettings(object, metaclass=MacSingleInstance):
                 f"The settings file {self.settings_file_path} does "
                 "not exist. Creating a new one...")
             self.__copy_default_settings()
-        self.load_settings()
 
     def load_settings(self) -> Optional[dict]:
         """
@@ -71,11 +70,10 @@ class MacSettings(object, metaclass=MacSingleInstance):
         """
         # Read the settings from a YAML file.
         try:
-            self.thread_lock.acquire()
-            with open(file=self.settings_file_path,
-                      mode='rb') as yml_file:
-                self.__app_settings = yaml.safe_load(stream=yml_file)
-            self.thread_lock.release()
+            with self.__thread_lock:
+                with open(file=self.settings_file_path,
+                          mode='rb') as yml_file:
+                    self.__app_settings = yaml.safe_load(stream=yml_file)
             self.mac_logger.info("Successfully loaded the settings.")
         except yaml.YAMLError as yaml_error:
             self.mac_logger.error("There was a problem parsing"
@@ -83,40 +81,66 @@ class MacSettings(object, metaclass=MacSingleInstance):
                                   yaml_error)
         return self.__app_settings
 
-    def __getitem__(self, key) -> any:
+    def __getitem__(self, keys: any) -> any:
         """
-        Make this class behave like a dictionary
+        Get the value from the underlying settings dictionary.
 
         Args:
-            item (str): The name of the key to look for
+            key (any): If querying a muli-level dictionary, this will
+                       be a tuple.
 
         Returns:
-            any: The dictionary value againts the key
+            any: This could either be the menu, or a subset of the full
+                 dictionary.
         """
-        chainmap = collections.ChainMap()
-        chainmap.new_child(key)
-        
-        #if not self.key_exists(key_name=keys):
-        #    raise MacSettingsException(f"Setting {keys} does not exist")
-        # self.thread_lock.acquire()
-        # setting: any = self.app_settings[key]
-        # self.thread_lock.release()
-        # return setting
+        value = None
+        if isinstance(keys, str):
+            if keys not in self.__app_settings:
+                raise MacException(f"key {keys} is not in the dictionary.")
+            with self.__thread_lock:
+                value = self.__app_settings[keys]
+        if isinstance(keys, tuple):
+            with self.__thread_lock:
+                value = (reduce(operator.getitem, keys, self.__app_settings))
+        return value
 
-    def __setitem__(self, key, key_value: any) -> None:
+    def __setitem__(self, keys: any, value: any) -> None:
         """
-        Make this class behave like a dictionary. This will update
-        the values in the settings dictionary and save the update.
+        Set the value of an item in the dictionary. This is slightly different
+        from the multi-index pattern in that the key names are passed as a
+        tuple. For example msettings['level1', 'level2'] = value
 
         Args:
-            key (str): The name of the key to save the value against
-                       in the dictionary
-            key_value (any): The value to save against the supplied key
+            keys (any): The keys can be either a string, or a tuple
+            value (any): The value to set the key/value to.
         """
-        self.thread_lock.acquire()
-        self.app_settings[key] = key_value
-        self.thread_lock.release()
+
+        if isinstance(keys, str):
+            with self.__thread_lock:
+                self.__app_settings[keys] = value
+        else:
+            with self.__thread_lock:
+                (reduce(operator.getitem, keys[:-1],
+                        self.__app_settings))[keys[-1]] = value
         self.save_settings()
+
+    def __contains__(self, keys: any) -> bool:
+        """
+        Check whether the key exists
+
+        Args:
+            keys (any): The name of the key to find. Can be
+                        string or tuple.
+
+        Returns:
+            bool: True or False based on whether the key exists.
+        """
+        if isinstance(keys, str):
+            with self.__thread_lock:
+                bool_value = keys in self.__app_settings
+        else:
+            bool_value = keys[-1] in self.__getitem__(keys[:-1])
+        return bool_value
 
     def get_all_settings(self) -> dict:
         """
@@ -125,7 +149,7 @@ class MacSettings(object, metaclass=MacSingleInstance):
         Returns:
             dict: The settings dictionary
         """
-        return self.app_settings
+        return self.__app_settings
 
     def save_settings(self) -> None:
         """
@@ -134,29 +158,17 @@ class MacSettings(object, metaclass=MacSingleInstance):
         try:
             self.mac_logger.debug(
                 f"Saving settings to {self.settings_file_path}")
-            self.thread_lock.acquire()
-            with open(file=self.settings_file_path,
-                      mode='w',) as yml_file:
-                yaml.dump(data=self.app_settings,
-                          stream=yml_file, indent=4,
-                          default_flow_style=False)
-            self.thread_lock.release()
+            with self.__thread_lock:
+                with open(file=self.settings_file_path,
+                          mode='w',) as yml_file:
+                    yaml.dump(data=self.__app_settings,
+                              stream=yml_file, indent=4,
+                              default_flow_style=False,
+                              allow_unicode=True,
+                              encoding='utf8')
             self.mac_logger.debug("Successfully saved settings.")
         except Exception as err:
             self.mac_logger.error(f"Unable to save settings. {err}")
-
-    def key_exists(self, key_name: str) -> bool:
-        """
-        Check whether the key exists.
-        """
-        try:
-            self.thread_lock.acquire()
-            reduce(lambda current_dict, key: current_dict[key],
-                   key_depth, self.app_settings)
-            self.thread_lock.release()
-            return True
-        except (KeyError, TypeError):
-            return False
 
     def __copy_default_settings(self) -> None:
         """
