@@ -12,6 +12,7 @@
         Copyright (c) John MacGrillen. All rights reserved.
 """
 import pytest
+import shutil
 from unittest.mock import mock_open, patch
 from maclib.mac_settings import MacSettings, MacSettingsException
 import maclib.mac_file_management as file_man
@@ -446,29 +447,131 @@ def test_12_contains_failed(monkeypatch):
     with pytest.raises(MacSettingsException):
         assert ['str1', 'str2'] in test_settings
 
-# def test_12_contains_failed(monkeypatch):
-#     """
-#     Test the load settings function works
 
-#     Args:
-#         monkeypatch (_type_): _description_
-#     """
-#     global fake_files
-#     global settings_dict
+def test_13_copy_defaults(monkeypatch):
+    """
+    Test the load settings function works
 
-#     def mock_exists(os_path):
-#         """
-#         Make sure the file name passed is known about  and
-#         return true.
+    Args:
+        monkeypatch (_type_): _description_
+    """
+    global fake_files
+    global settings_dict
 
-#         Args:
-#             faked_name (str): File Name to check
-#         """
-#         assert os_path in fake_files
-#         return True
+    def mock_exists(os_path):
+        """
+        Make sure the file name passed is known about  and
+        return true.
+
+        Args:
+            faked_name (str): File Name to check
+        """
+        assert os_path in fake_files
+        return True
+
+    def mock_dir_exist(os_path):
+        """
+        Make sure the file name passed is known about  and
+        return true.
+
+        Args:
+            faked_name (str): File Name to check
+        """
+        return True
+
+    def mock_copy(src, dst):
+        """
+        shutils file copy mock
+
+        Args:
+            src (_type_): _description_
+            dst (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        assert src == fake_files[1]
+        assert dst == fake_files[0]
+        return True
+
+    monkeypatch.setattr(file_man, "does_exist", mock_exists)
+    test_settings = MacSettings(
+        settings_file_path=fake_files[0],
+        default_settings_path=fake_files[1])
+
+    monkeypatch.setattr(shutil, "copyfile", mock_copy)
+    monkeypatch.setattr(file_man, "does_exist", mock_dir_exist)
+    test_settings._copy_default_settings()
 
 
-#     monkeypatch.setattr(file_man, "does_exist", mock_exists)
+def test_14_copy_create_directory(monkeypatch):
+    """
+    Test the load settings function works
+
+    Args:
+        monkeypatch (_type_): _description_
+    """
+    global fake_files
+    global settings_dict
+
+    def mock_exists(os_path):
+        """
+        Make sure the file name passed is known about  and
+        return true.
+
+        Args:
+            faked_name (str): File Name to check
+        """
+        assert os_path in fake_files
+        return True
+
+    def mock_dir_exist(os_path):
+        """
+        Make sure the file name passed is known about  and
+        return true.
+
+        Args:
+            faked_name (str): File Name to check
+        """
+        return False
+
+    def mock_copy(src, dst):
+        """
+        shutils file copy mock
+
+        Args:
+            src (_type_): _description_
+            dst (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        assert src == fake_files[1]
+        assert dst == fake_files[0]
+        return True
+
+    def mock_create(dir):
+        """
+        shutils file copy mock
+
+        Args:
+            src (_type_): _description_
+            dst (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        return True
+
+    monkeypatch.setattr(file_man, "does_exist", mock_exists)
+    test_settings = MacSettings(
+        settings_file_path=fake_files[0],
+        default_settings_path=fake_files[1])
+
+    monkeypatch.setattr(shutil, "copyfile", mock_copy)
+    monkeypatch.setattr(file_man, "does_exist", mock_dir_exist)
+    monkeypatch.setattr(file_man, "create_dir", mock_create)
+    test_settings._copy_default_settings()
 
 
 if __name__ == "__main__":  # pragma: no cover
