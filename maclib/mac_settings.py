@@ -97,7 +97,8 @@ class MacSettings(metaclass=MacSingleInstance):
         value = None
         if isinstance(keys, str):
             if keys not in self.__app_settings:
-                raise MacException(f"key {keys} is not in the dictionary.")
+                raise MacSettingsException(f"key {keys} is not in the "
+                                           "dictionary.")
             with self.__thread_lock:
                 value = self.__app_settings[keys]
         if isinstance(keys, tuple):
@@ -139,8 +140,15 @@ class MacSettings(metaclass=MacSingleInstance):
         if isinstance(keys, str):
             with self.__thread_lock:
                 bool_value = keys in self.__app_settings
+        elif isinstance(keys, tuple):
+            if keys[0] not in self.__app_settings:
+                bool_value = False
+            else:
+                bool_value = keys[-1] in self.__getitem__(keys[:-1])
         else:
-            bool_value = keys[-1] in self.__getitem__(keys[:-1])
+            raise MacSettingsException(
+                "Use either a single string or a tuple to query whether"
+                " the setting exists.")
         return bool_value
 
     def get_all_settings(self) -> dict:
@@ -169,7 +177,7 @@ class MacSettings(metaclass=MacSingleInstance):
                               encoding='utf8')
             self.mac_logger.debug("Successfully saved settings.")
         except Exception as err:
-            self.mac_logger.error(f"Unable to save settings. {err}")
+            raise MacSettingsException(f"Unable to save settings. {err}")
 
     def _copy_default_settings(self) -> None:
         """
