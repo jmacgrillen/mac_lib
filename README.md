@@ -15,5 +15,6 @@ The code includes:
 - `mac_logger.py` - Configures the builtin logging so it logs to file and console in an easy to understand way
 - `mac_progress.py` - A simple console based progress bar
 - `mac_request.py` - Small wrapper around *requests* mostly to handle persistent headers
+- `mac_settings.py` - Application settings, built on the Singleton pattern
 - `mac_single.py` - Singleton pattern class
 - `mac_spinner.py` - A simple console spinner
