@@ -39,14 +39,20 @@ def configure_logger(log_file_uri: str = None,
     """
     Setup the built in logger to work as we want it.
 
-    :arg log_file_uri: Where we want to make our log file
-    :arg logging_level: What level do we want to start logging at?
+    Args:
+        log_file_uri (str): Where we want to make our log file
+        logging_level (int): What level do we want to start logging at?
                         Default is set to INFO
-    :arg logger_name: Set the logger name. The default will be the name of the
-                      process. It can overridden here, but wn't be persistent.
-    :arg use_stdout: Flag to show whether to output to stdout or not.
-    :arg use_utc: Log timestamp will use UTC. False by default
-    :arg use_format: Format the output as SYSLOG or JSON. Default is SYSLOG.
+        logger_name (str): Set the logger name. The default will be the name
+                           of the process. It can overridden here, but won't
+                           be persistent.
+        use_stdout (bool): Flag to show whether to output to stdout or not.
+        use_utc (bool): Log timestamp will use UTC. False by default
+        use_format (int): Format the output as SYSLOG or JSON. Default is
+                          SYSLOG.
+
+    Returns:
+        logging.logger: A fully configured persisten logger
     """
     # We may not need a file, so only configure it if it's been set.
     # Otherwise just dump to the console.
@@ -57,12 +63,12 @@ def configure_logger(log_file_uri: str = None,
     date_config: str
 
     if use_format is FORMAT_JSON:
-        if use_utc is True:
+        if use_utc:
             format_config = "{ event_time : \"%(asctime)s.%(msecs)03dZ\"" \
                             ",level : \"%(levelname)s\", function_name: \"" \
                             "%(module)s.%(funcName)s\", message: \"" \
                             "%(message)s\" }"
-        elif use_utc is False:
+        else:
             format_config = "{ event_time : \"%(asctime)s.%(msecs)03d\", " \
                             "level : \"%(levelname)s\", function_name: \"" \
                             " %(module)s.%(funcName)s\", message: \"" \
@@ -98,7 +104,7 @@ def configure_logger(log_file_uri: str = None,
                 sys.exit(1)
         log_file_handler = logging.handlers.RotatingFileHandler(
             filename=log_file_uri,
-            maxBytes=1240000,
+            maxBytes=1048576,
             backupCount=5)
     else:
         log_file_handler = logging.StreamHandler()
