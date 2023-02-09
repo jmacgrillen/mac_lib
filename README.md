@@ -8,6 +8,7 @@ mac_lib is a collection of handy Python boiler plate code snippets.
 These are dsigned to help *me* accelerate creating Python programs with out-of-the-box support for logging, settingss files, etc.
 
 The code includes:
+
 - `mac_colours.py` - Nothing earth shattering, just rgb to hex conversion
 - `mac_detect.py` - A few pieces to help identify bits like OS and Python version
 - `mac_exception.py` - A simple exception that logs the error message into the application log
