@@ -16,19 +16,20 @@
 import sys
 
 
-def progress(count, total, status=''):
+def progress(count: any, total: any, status: str = '') -> float:
     """
     Console based progress bar.
     """
-    bar_len = 55
-    filled_len = int(round(bar_len * count / float(total)))
+    bar_len: int = 55
+    filled_len: int = int(round(bar_len * count / float(total)))
 
-    percents = round(100.0 * count / float(total), 2)
-    str_precents = f" {percents:>5}% "
-    bar = '▓' * filled_len + '░' * (bar_len - filled_len)
-    full_bar = bar[:int(bar_len / 2)] + str_precents + bar[int(bar_len / 2):]
+    percents: float = round(100.0 * count / float(total), 2)
+    str_precents: str = f" {percents:>5}% "
+    bar: str = '▓' * filled_len + '░' * (bar_len - filled_len)
+    full_bar: str = bar[:int(bar_len / 2)] + str_precents + bar[
+        int(bar_len / 2):]
 
-    fmt_str = f'[{full_bar}] {status}'
+    fmt_str: str = f'[{full_bar}] {status}'
     print('\b' * len(fmt_str), end='')  # clears the line
     sys.stdout.write(fmt_str)
     sys.stdout.flush()
