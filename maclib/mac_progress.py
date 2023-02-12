@@ -33,3 +33,7 @@ def progress(count, total, status=''):
     sys.stdout.write(fmt_str)
     sys.stdout.flush()
     return percents
+
+
+if __name__ == "__main__":  # pragma: no cover
+    pass
