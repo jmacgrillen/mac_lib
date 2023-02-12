@@ -38,7 +38,7 @@ def setup_maclib_package() -> None:
         include_package_data=True,
         install_requires=install_requirements,
         license="Apache License 2.0",
-        python_requires=">= 3.9",
+        python_requires=">= 3.8",
         classifiers=[
             'Development Status :: 5 - Production/Stable',
             'Intended Audience :: Developers',
