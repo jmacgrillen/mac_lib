@@ -22,6 +22,7 @@ install_requirements = [
     "requests",
     "pytest",
     "responses",
+    "pywin32; platform_system=='Windows'"
 ]
 
 
@@ -31,7 +32,7 @@ def setup_maclib_package() -> None:
     """
     setup(
         name='maclib',
-        version="0.0.1",
+        version="0.1.dev2",
         description='Useful stuff for building apps',
         long_description=long_description,
         author='J.MacGrillen',

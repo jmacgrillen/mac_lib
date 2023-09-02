@@ -5,10 +5,17 @@
     Desscription:
         Setup logging to include:
          - ISO8601 date formatting.
-         - Optional use UTC.
          - Render as SYSLOG or JSON.
          - Rotate log files at 1MB, keeps the last 5.
+         - Automatic Windows Event Log support
     Version:
+        2 - The time stamp is now fully ISO 8601 compliant, removing the
+            use_utc flag as it's no longer needed. All times are UTC with
+            the offset shown for local time.
+          - Added Windows Event Log support instead of writing to a file.
+          - Added support for macOS X
+          - Automatically places the log file in the correct folder for the
+            platform.
         1 - Inital release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
@@ -30,24 +37,26 @@ FORMAT_JSON = 2
 LOGGER_NAME = Path(inspect.stack()[-1][1]).stem
 
 
-def configure_logger(log_file_uri: str = None,
+def configure_logger(app_name: str = None,
                      logging_level: int = logging.INFO,
                      logger_name: str = LOGGER_NAME,
-                     use_stdout: bool = True,
-                     use_utc: bool = True,
+                     console_only: bool = False,
+                     suppress_console: bool = False,
                      use_format: int = FORMAT_SYSLOG) -> logging.Logger:
     """
     Setup the built in logger to work as we want it.
 
     Args:
-        log_file_uri (str): Where we want to make our log file
+        app_name (str): The name given to the application.
         logging_level (int): What level do we want to start logging at?
-                        Default is set to INFO
+                             Default is set to INFO
         logger_name (str): Set the logger name. The default will be the name
                            of the process. It can overridden here, but won't
                            be persistent.
-        use_stdout (bool): Flag to show whether to output to stdout or not.
-        use_utc (bool): Log timestamp will use UTC. False by default
+        console_only (bool): Don't output to file/Event Log, only to the
+                             console.
+        suppress_console (bool): Don't output to the console, only to the
+                                 file/Event Log.
         use_format (int): Format the output as SYSLOG or JSON. Default is
                           SYSLOG.
 
@@ -59,40 +68,51 @@ def configure_logger(log_file_uri: str = None,
     log_formatter: logging.Formatter
     mac_logger: logging.Logger
     log_file_handler: logging.Handler
+    log_file_uri: str
     format_config: str
     date_config: str
+    tz: str = time.strftime('%z')
 
     if use_format is FORMAT_JSON:
-        if use_utc:
-            format_config = "{ event_time : \"%(asctime)s.%(msecs)03dZ\"" \
-                            ",level : \"%(levelname)s\", function_name: \"" \
-                            "%(module)s.%(funcName)s\", message: \"" \
-                            "%(message)s\" }"
-        else:
-            format_config = "{ event_time : \"%(asctime)s.%(msecs)03d\", " \
-                            "level : \"%(levelname)s\", function_name: \"" \
-                            " %(module)s.%(funcName)s\", message: \"" \
-                            "%(message)s\" }"
+        format_config = "{ event_time : \"%(asctime)s.%(msecs)03dZ" + tz + \
+                        "\", level: \"%(levelname)s\", function_name: \"" \
+                        "%(module)s.%(funcName)s\", message: \"" \
+                        "%(message)s\" }"
     else:
-        if use_utc:
-            format_config = "%(asctime)s.%(msecs)03dZ %(levelname)s " \
-                            "%(module)s.%(funcName)s %(message)s"
-        else:
-            format_config = "%(asctime)s.%(msecs)03d %(levelname)s " \
-                            "%(module)s.%(funcName)s %(message)s"
+        format_config = "%(asctime)s.%(msecs)03dZ" + tz + " %(levelname)s " \
+                        "%(module)s.%(funcName)s %(message)s"
 
     # ISO8601 Time format
     date_config = "%Y-%m-%dT%H:%M:%S"
 
+    # Create the log formatter. use the same format across all platforms.
+    # I know Windows does it's own thing, but this way the log event
+    # will look the same regardless of environment.
     log_formatter = logging.Formatter(
             fmt=format_config,
-            datefmt=date_config
-        )
-    if use_utc:
-        log_formatter.converter = time.gmtime
+            datefmt=date_config)
+    log_formatter.converter = time.gmtime
     mac_logger = logging.getLogger(name=logger_name)
 
-    if log_file_uri:
+    # Added support for macOS X as well as Linux/BSD
+    if 'darwin' == sys.platform:
+        log_file_uri = os.path.expanduser(
+                '~/Library/Logs')
+        log_file_uri = f'{log_file_uri}/{app_name}.log'
+    else:
+        log_file_uri = os.getenv('XDG_CACHE_HOME')
+        log_file_uri = f'{log_file_uri}/log/{app_name}.log'
+
+    if console_only:
+        log_file_handler = logging.StreamHandler()
+    elif 'win32' == sys.platform:
+        # On Windows log records go to the Windows Event Log.
+        # Worth noting that debug messages will appear as
+        # Information messages in the application Event Log.
+        log_file_handler = logging.handlers.NTEventLogHandler(
+            appname=app_name,
+            logtype="Application")
+    else:
         # Check the logging directory is available.
         # If not create it.
         if not os.path.isdir(os.path.dirname(log_file_uri)):
@@ -106,13 +126,12 @@ def configure_logger(log_file_uri: str = None,
             filename=log_file_uri,
             maxBytes=1048576,
             backupCount=5)
-    else:
-        log_file_handler = logging.StreamHandler()
     log_file_handler.setFormatter(fmt=log_formatter)
+
     mac_logger.addHandler(hdlr=log_file_handler)
     # User can supress console spam, but the log file will still be
     # written to.
-    if use_stdout:
+    if not suppress_console:
         log_std_out = logging.StreamHandler(stream=sys.stdout)
         log_std_out.setFormatter(fmt=log_formatter)
         mac_logger.addHandler(hdlr=log_std_out)

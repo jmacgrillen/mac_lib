@@ -6,6 +6,9 @@
         Manage applicatuon settings from a YAML file.
         There should be a set of defaults.
     Version:
+        2 - Settings are now automatically created where they
+            should be based on the platform the program is running
+            on. No longer need to remember where they should be.
         1 - Inital release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
@@ -19,6 +22,8 @@ import logging
 import yaml
 import shutil
 import pathlib
+import os
+import sys
 from threading import Lock
 import maclib.mac_file_management as file_m
 import maclib.mac_logger as mac_logger
@@ -39,16 +44,29 @@ class MacSettings(metaclass=MacSingleInstance):
     Make sure the logger is initialised before calling this class.
     """
     mac_logger: logging.Logger
+    settings_file_directory: str
     settings_file_path: str
     default_settings_path: str
     __app_settings: dict
     __thread_lock: Lock
 
     def __init__(self,
-                 settings_file_path: str,
+                 app_name: str,
                  default_settings_path: str) -> None:
         super(MacSettings, self).__init__()
-        self.settings_file_path = settings_file_path
+        if 'win32' == sys.platform:
+            # Use the standard Windows config file storage area
+            self.settings_file_directory = os.getenv('LOCALAPPDATA')
+        elif 'darwin' == sys.platform:
+            self.settings_file_directory = os.path.expanduser(
+                '~/Library/Application Support')
+        else:
+            # Not using Windows, nor mac so assume Linux/BSD
+            self.settings_file_path = os.getenv('XDG_CONFIG_HOME')
+        self.settings_file_directory = f'{self.settings_file_directory}\\' \
+                                       f'{app_name}'
+        self.settings_file_path = f'{self.settings_file_directory}' \
+                                  f'\\{app_name}.yaml'
         self.default_settings_path = default_settings_path
         self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
         self.__app_settings = dict()
