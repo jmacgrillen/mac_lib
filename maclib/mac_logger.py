@@ -95,17 +95,18 @@ def configure_logger(app_name: str = None,
     mac_logger = logging.getLogger(name=logger_name)
 
     # Added support for macOS X as well as Linux/BSD
-    if 'darwin' == sys.platform:
+    if 'darwin' == sys.platform:  # pragma: no cover
         log_file_uri = os.path.expanduser(
                 '~/Library/Logs')
         log_file_uri = f'{log_file_uri}/{app_name}.log'
     else:
-        log_file_uri = os.getenv('XDG_CACHE_HOME')
-        log_file_uri = f'{log_file_uri}/log/{app_name}.log'
+        log_file_uri = os.path.expanduser(
+                '~/.local/state')
+        log_file_uri = f'{log_file_uri}/{app_name}.log'
 
     if console_only:
         log_file_handler = logging.StreamHandler()
-    elif 'win32' == sys.platform:
+    elif 'win32' == sys.platform:  # pragma: no cover
         # On Windows log records go to the Windows Event Log.
         # Worth noting that debug messages will appear as
         # Information messages in the application Event Log.

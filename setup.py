@@ -21,6 +21,8 @@ install_requirements = [
     "PyYaml",
     "requests",
     "pytest",
+    "pytest-cov",
+    "fake-winreg; platform_system!='Windows'",
     "responses",
     "pywin32; platform_system=='Windows'"
 ]

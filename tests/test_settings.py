@@ -18,8 +18,8 @@ from maclib.mac_settings import MacSettings, MacSettingsException
 import maclib.mac_file_management as file_man
 
 
-fake_files = ["mysettings.yaml", "defaults.yaml"]
-
+app_name = 'test_app'
+fake_files = [f"~/.config/{app_name}/{app_name}.yaml", "defaults.yaml"]
 settings_dict = dict()
 settings_dict['fake_load'] = 'True Dat'
 settings_dict['something'] = dict()
@@ -48,7 +48,7 @@ def test_01_settings_default_exist(monkeypatch):
 
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
     assert test_settings.settings_file_path == fake_files[0]
     assert test_settings.default_settings_path == fake_files[1]
@@ -66,7 +66,7 @@ def test_02_defaults_not_exist():
 
     with pytest.raises(MacSettingsException):
         assert MacSettings(
-           settings_file_path=fake_files[0],
+           app_name=app_name,
            default_settings_path=fake_files[1])
 
 
@@ -102,7 +102,7 @@ def test_03_settings_not_exist(monkeypatch):
                         "_copy_default_settings",
                         copy_file)
     MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
 
@@ -130,7 +130,7 @@ def test_04_load_settings(monkeypatch):
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
 
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
     with patch("builtins.open", mock_open(read_data=str(settings_dict))):
@@ -169,7 +169,7 @@ def test_05_load_failure(monkeypatch):
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
 
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
     with patch("builtins.open", mock_open(read_data=str_yaml)):
@@ -201,7 +201,7 @@ def test_06_get_item(monkeypatch):
     # Patch in the does_exist
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
     # Now make it look like the open command is returning a YAML string
@@ -238,7 +238,7 @@ def test_07_get_item_fail(monkeypatch):
     # Patch in the does_exist
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
     # Now make it look like the open command is returning a YAML string
@@ -273,7 +273,7 @@ def test_08_save_file_normal(monkeypatch):
     # Patch in the does_exist
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
     # Now make it look like the open command is returning a YAML string
@@ -320,7 +320,7 @@ def test_09_save_file_failed(monkeypatch):
     # Patch in the does_exist
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
     # Now make it look like the open command is returning a YAML string
@@ -357,7 +357,7 @@ def test_10_set_item(monkeypatch):
     # Patch in the does_exist
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
     # Now make it look like the open command is returning a YAML string
@@ -401,7 +401,7 @@ def test_11_contains_success(monkeypatch):
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
 
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
     with patch("builtins.open", mock_open(read_data=str(settings_dict))):
@@ -439,7 +439,7 @@ def test_12_contains_failed(monkeypatch):
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
 
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
     with patch("builtins.open", mock_open(read_data=str(settings_dict))):
@@ -496,7 +496,7 @@ def test_13_copy_defaults(monkeypatch):
 
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
     monkeypatch.setattr(shutil, "copyfile", mock_copy)
@@ -565,7 +565,7 @@ def test_14_copy_create_directory(monkeypatch):
 
     monkeypatch.setattr(file_man, "does_exist", mock_exists)
     test_settings = MacSettings(
-        settings_file_path=fake_files[0],
+        app_name=app_name,
         default_settings_path=fake_files[1])
 
     monkeypatch.setattr(shutil, "copyfile", mock_copy)

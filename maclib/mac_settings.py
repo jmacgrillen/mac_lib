@@ -54,19 +54,21 @@ class MacSettings(metaclass=MacSingleInstance):
                  app_name: str,
                  default_settings_path: str) -> None:
         super(MacSettings, self).__init__()
-        if 'win32' == sys.platform:
+        if 'win32' == sys.platform:  # pragma: no cover
             # Use the standard Windows config file storage area
             self.settings_file_directory = os.getenv('LOCALAPPDATA')
-        elif 'darwin' == sys.platform:
+        elif 'darwin' == sys.platform:  # pragma: no cover
             self.settings_file_directory = os.path.expanduser(
                 '~/Library/Application Support')
         else:
             # Not using Windows, nor mac so assume Linux/BSD
-            self.settings_file_path = os.getenv('XDG_CONFIG_HOME')
-        self.settings_file_directory = f'{self.settings_file_directory}\\' \
+            self.settings_file_directory = os.path.expandvars(
+                '~/.config')
+
+        self.settings_file_directory = f'{self.settings_file_directory}/' \
                                        f'{app_name}'
         self.settings_file_path = f'{self.settings_file_directory}' \
-                                  f'\\{app_name}.yaml'
+                                  f'/{app_name}.yaml'
         self.default_settings_path = default_settings_path
         self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
         self.__app_settings = dict()
