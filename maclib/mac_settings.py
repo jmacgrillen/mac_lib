@@ -62,7 +62,7 @@ class MacSettings(metaclass=MacSingleInstance):
                 '~/Library/Application Support')
         else:
             # Not using Windows, nor mac so assume Linux/BSD
-            self.settings_file_directory = os.path.expandvars(
+            self.settings_file_directory = os.path.expanduser(
                 '~/.config')
 
         self.settings_file_directory = f'{self.settings_file_directory}/' \
@@ -207,14 +207,15 @@ class MacSettings(metaclass=MacSingleInstance):
         """
         parent_directory = pathlib.Path(
             self.settings_file_path).parent.absolute()
+        print(self.settings_file_path)
         if not file_m.does_exist(parent_directory):
-            self.mac_logger.debug(
+            self.mac_logger.info(
                 "Settings file parent directory needs to be created")
             file_m.create_dir(parent_directory)
-        self.mac_logger.debug("Copying default settings...")
+        self.mac_logger.info("Copying default settings...")
         shutil.copyfile(src=self.default_settings_path,
                         dst=self.settings_file_path)
-        self.mac_logger.debug("Default settings copied into place.")
+        self.mac_logger.info("Default settings copied into place.")
 
 
 if __name__ == "__main__":  # pragma: no cover
