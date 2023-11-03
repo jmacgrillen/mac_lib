@@ -6,6 +6,8 @@
         Manage applicatuon settings from a YAML file.
         There should be a set of defaults.
     Version:
+        3 - Added a file watcher to pickup when the settings are
+            changed by another process.
         2 - Settings are now automatically created where they
             should be based on the platform the program is running
             on. No longer need to remember where they should be.
@@ -25,6 +27,8 @@ import pathlib
 import os
 import sys
 from threading import Lock
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 import maclib.mac_file_management as file_m
 import maclib.mac_logger as mac_logger
 from maclib.mac_single import MacSingleInstance
@@ -38,6 +42,39 @@ class MacSettingsException(MacException):
     pass
 
 
+class MacSettingsWatchdogHandler(FileSystemEventHandler):
+    """
+    Set a watcher on the settings file, so we can check
+    whether there have been changes made. If there is then
+    we reload the settings.
+    """
+    mac_logger: logging.Logger
+    __settings_object: object
+
+    def __init__(self, settings_object: object) -> None:
+        """
+        Store the main settings object
+
+        Args:
+            settings_object (object): Pass in the main settings
+            object.
+        """
+        super(MacSettingsWatchdogHandler).__init__()
+        self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
+        self.__settings_object = settings_object
+
+    def on_modified(self, event) -> None:
+        """
+        We're only interested in whether the file has been changed or not.
+
+        Args:
+            event (_type_): _description_
+        """
+        self.mac_logger.debug("File change detected.")
+        self.__settings_object.load_settings()
+        self.__settings_object.__execute_callbacks()
+
+
 class MacSettings(metaclass=MacSingleInstance):
     """
     Handle global apps setting using a singleton class.
@@ -47,8 +84,11 @@ class MacSettings(metaclass=MacSingleInstance):
     settings_file_directory: str
     settings_file_path: str
     default_settings_path: str
+    __settings_file_observer: Observer
+    __file_change_handler: MacSettingsWatchdogHandler
     __app_settings: dict
     __thread_lock: Lock
+    __call_backs: list
 
     def __init__(self,
                  app_name: str,
@@ -73,6 +113,7 @@ class MacSettings(metaclass=MacSingleInstance):
         self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
         self.__app_settings = dict()
         self.__thread_lock = Lock()
+        self.__call_backs = []
         if not file_m.does_exist(os_path=default_settings_path):
             raise MacSettingsException(
                 "The default settings file "
@@ -83,6 +124,14 @@ class MacSettings(metaclass=MacSingleInstance):
                 f"The settings file {self.settings_file_path} does "
                 "not exist. Creating a new one...")
             self._copy_default_settings()
+        self.__file_change_handler = MacSettingsWatchdogHandler(
+            settings_object=self)
+        self.__settings_file_observer = Observer()
+        self.__settings_file_observer.schedule(
+            event_handler=self.__file_change_handler,
+            path=self.settings_file_path,
+            recursive=False)
+        self.__settings_file_observer.start()
 
     def load_settings(self) -> Optional[dict]:
         """
@@ -144,7 +193,10 @@ class MacSettings(metaclass=MacSingleInstance):
             with self.__thread_lock:
                 (reduce(operator.getitem, keys[:-1],
                         self.__app_settings))[keys[-1]] = value
+        self.__settings_file_observer.stop()
         self.save_settings()
+        self.__settings_file_observer.start()
+        self.__execute_callbacks()
 
     def __contains__(self, keys: any) -> bool:
         """
@@ -216,6 +268,23 @@ class MacSettings(metaclass=MacSingleInstance):
         shutil.copyfile(src=self.default_settings_path,
                         dst=self.settings_file_path)
         self.mac_logger.info("Default settings copied into place.")
+
+    def callback_on_change_event(self, call_back_function: object) -> None:
+        """
+        Register a callback thatwill be called when there's a change
+        to the settings file.
+
+        Args:
+            call_back_function (object): The function to be called.
+        """
+        if call_back_function not in self.__call_backs:
+            self.__call_backs.append(call_back_function)
+
+    def __execute_callbacks(self) -> None:
+        """
+        Run though all the callback functions registered.
+        """
+        [call_back() for call_back in self.__call_backs]
 
 
 if __name__ == "__main__":  # pragma: no cover

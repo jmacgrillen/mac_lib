@@ -24,7 +24,8 @@ install_requirements = [
     "pytest-cov",
     "fake-winreg; platform_system!='Windows'",
     "responses",
-    "pywin32; platform_system=='Windows'"
+    "pywin32; platform_system=='Windows'",
+    "watchdog"
 ]
 
 
