@@ -29,6 +29,15 @@ class MacSingleInstance(type):
             cls._instances[cls] = instance
         return cls._instances[cls]
 
+    def clear(cls):
+        """
+        Remove the singleton
+        """
+        try:
+            del cls._instances[cls]
+        except KeyError:
+            pass
+
 
 if __name__ == "__main__":  # pragma: no cover
     pass

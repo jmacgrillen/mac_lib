@@ -6,6 +6,7 @@
         Manage applicatuon settings from a YAML file.
         There should be a set of defaults.
     Version:
+        4 - Added callback support to notify objects of settings changes.
         3 - Added a file watcher to pickup when the settings are
             changed by another process.
         2 - Settings are now automatically created where they
@@ -50,6 +51,7 @@ class MacSettingsWatchdogHandler(FileSystemEventHandler):
     """
     mac_logger: logging.Logger
     __settings_object: object
+    _pause_observer: bool = False
 
     def __init__(self, settings_object: object) -> None:
         """
@@ -70,9 +72,10 @@ class MacSettingsWatchdogHandler(FileSystemEventHandler):
         Args:
             event (_type_): _description_
         """
-        self.mac_logger.debug("File change detected.")
-        self.__settings_object.load_settings()
-        self.__settings_object.__execute_callbacks()
+        if not self._pause_observer:
+            self.mac_logger.debug("File change detected.")
+            self.__settings_object.load_settings()
+            self.__settings_object._execute_callbacks()
 
 
 class MacSettings(metaclass=MacSingleInstance):
@@ -88,7 +91,7 @@ class MacSettings(metaclass=MacSingleInstance):
     __file_change_handler: MacSettingsWatchdogHandler
     __app_settings: dict
     __thread_lock: Lock
-    __call_backs: list
+    _call_backs: list
 
     def __init__(self,
                  app_name: str,
@@ -113,12 +116,13 @@ class MacSettings(metaclass=MacSingleInstance):
         self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
         self.__app_settings = dict()
         self.__thread_lock = Lock()
-        self.__call_backs = []
-        if not file_m.does_exist(os_path=default_settings_path):
+        self._call_backs = []
+        if not file_m.does_exist(os_path=self.default_settings_path):
             raise MacSettingsException(
-                "The default settings file "
-                f"{self.default_settings_path} does not "
-                "exist. This is a terminal failure.")
+                str_message="The default settings file"
+                            f" {self.default_settings_path} does "
+                            "not exist. This is a terminal "
+                            "failure.")
         if not file_m.does_exist(os_path=self.settings_file_path):
             self.mac_logger.info(
                 f"The settings file {self.settings_file_path} does "
@@ -193,10 +197,9 @@ class MacSettings(metaclass=MacSingleInstance):
             with self.__thread_lock:
                 (reduce(operator.getitem, keys[:-1],
                         self.__app_settings))[keys[-1]] = value
-        self.__settings_file_observer.stop()
+        self.__file_change_handler._pause_observer = True
         self.save_settings()
-        self.__settings_file_observer.start()
-        self.__execute_callbacks()
+        self.__file_change_handler._pause_observer = False
 
     def __contains__(self, keys: any) -> bool:
         """
@@ -269,7 +272,9 @@ class MacSettings(metaclass=MacSingleInstance):
                         dst=self.settings_file_path)
         self.mac_logger.info("Default settings copied into place.")
 
-    def callback_on_change_event(self, call_back_function: object) -> None:
+    def register_callback_on_change_event(
+            self,
+            call_back_function: object) -> None:
         """
         Register a callback thatwill be called when there's a change
         to the settings file.
@@ -277,14 +282,14 @@ class MacSettings(metaclass=MacSingleInstance):
         Args:
             call_back_function (object): The function to be called.
         """
-        if call_back_function not in self.__call_backs:
-            self.__call_backs.append(call_back_function)
+        if call_back_function not in self._call_backs:
+            self._call_backs.append(call_back_function)
 
-    def __execute_callbacks(self) -> None:
+    def _execute_callbacks(self) -> None:
         """
         Run though all the callback functions registered.
         """
-        [call_back() for call_back in self.__call_backs]
+        [call_back() for call_back in self._call_backs]
 
 
 if __name__ == "__main__":  # pragma: no cover
