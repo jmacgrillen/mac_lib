@@ -6,6 +6,7 @@
         Manage applicatuon settings from a YAML file.
         There should be a set of defaults.
     Version:
+        5 - Switched to event messages from direct callback.
         4 - Added callback support to notify objects of settings changes.
         3 - Added a file watcher to pickup when the settings are
             changed by another process.
@@ -34,6 +35,7 @@ import maclib.mac_file_management as file_m
 import maclib.mac_logger as mac_logger
 from maclib.mac_single import MacSingleInstance
 from maclib.mac_exception import MacException
+from maclib.mac_events import MacEventPublisher, MacEvent
 
 
 class MacSettingsException(MacException):
@@ -50,10 +52,12 @@ class MacSettingsWatchdogHandler(FileSystemEventHandler):
     we reload the settings.
     """
     mac_logger: logging.Logger
-    __settings_object: object
     _pause_observer: bool = False
+    events_publisher: MacEventPublisher
+    events = [
+        "reload_settings_file"]
 
-    def __init__(self, settings_object: object) -> None:
+    def __init__(self) -> None:
         """
         Store the main settings object
 
@@ -63,19 +67,22 @@ class MacSettingsWatchdogHandler(FileSystemEventHandler):
         """
         super(MacSettingsWatchdogHandler).__init__()
         self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
-        self.__settings_object = settings_object
+        self.events_publisher = MacEventPublisher(self.events)
 
     def on_modified(self, event) -> None:
         """
         We're only interested in whether the file has been changed or not.
+        Send the reload event to the registered class(es).
 
         Args:
             event (_type_): _description_
         """
         if not self._pause_observer:
             self.mac_logger.debug("File change detected.")
-            self.__settings_object.load_settings()
-            self.__settings_object._execute_callbacks()
+            update_event = MacEvent(
+                event_action=self.events[0])
+            self.events_publisher.publish(
+                update_event)
 
 
 class MacSettings(metaclass=MacSingleInstance):
@@ -87,11 +94,15 @@ class MacSettings(metaclass=MacSingleInstance):
     settings_file_directory: str
     settings_file_path: str
     default_settings_path: str
+    events_publisher: MacEventPublisher
     __settings_file_observer: Observer
     __file_change_handler: MacSettingsWatchdogHandler
     __app_settings: dict
     __thread_lock: Lock
-    _call_backs: list
+    events = [
+        "settings_change",
+        "settings_loaded",
+        "settings_reload"]
 
     def __init__(self,
                  app_name: str,
@@ -116,7 +127,7 @@ class MacSettings(metaclass=MacSingleInstance):
         self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
         self.__app_settings = dict()
         self.__thread_lock = Lock()
-        self._call_backs = []
+        self.events_publisher = MacEventPublisher(self.events)
         if not file_m.does_exist(os_path=self.default_settings_path):
             raise MacSettingsException(
                 str_message="The default settings file"
@@ -128,14 +139,20 @@ class MacSettings(metaclass=MacSingleInstance):
                 f"The settings file {self.settings_file_path} does "
                 "not exist. Creating a new one...")
             self._copy_default_settings()
-        self.__file_change_handler = MacSettingsWatchdogHandler(
-            settings_object=self)
+        # Set the file watchdog to pick up any changes made to the settings
+        # file from outside this process.
+        self.__file_change_handler = MacSettingsWatchdogHandler()
         self.__settings_file_observer = Observer()
         self.__settings_file_observer.schedule(
             event_handler=self.__file_change_handler,
             path=self.settings_file_path,
             recursive=False)
         self.__settings_file_observer.start()
+        # Register ourseleves with the event service to pick up
+        # file change notifications.
+        self.__file_change_handler.events_publisher.register(
+            event_action=self.__file_change_handler.events[0],
+            subscriber_callabck=self.reload_settings_from_file)
 
     def load_settings(self) -> Optional[dict]:
         """
@@ -148,12 +165,53 @@ class MacSettings(metaclass=MacSingleInstance):
                           mode='rb') as yml_file:
                     self.__app_settings = yaml.safe_load(stream=yml_file)
             self.mac_logger.info("Successfully loaded the settings.")
+            change_event = MacEvent(event_action=self.events[1])
+            self.events_publisher.post_event(event=change_event)
         except yaml.YAMLError as yaml_error:
             raise MacSettingsException(
                 "There was a problem parsing"
                 f" the file {self.settings_file_path}"
                 f" {yaml_error}")
         return self.__app_settings
+
+    def reload_settings_from_file(self) -> None:
+        """
+        Reload the settings.
+        """
+        self.mac_logger.debug("Reloading the settings from the file.")
+        self.load_settings()
+        update_event = MacEvent(
+                event_action=self.events[2])
+        self.__settings_object.events_publisher.publish(
+                update_event)
+
+    def register_for_events(self, event: str, call_back) -> None:
+        """
+        Register a callback for a given event.
+
+        Args:
+            event (str): The name of the event
+            call_back (Any): The function to execute on callback
+        """
+        self.events_publisher.register(
+            event_action=event,
+            subscriber_callabck=call_back)
+        self.mac_logger.debug(
+            f"Registered a callback {call_back} for {event}.")
+
+    def unregister_for_events(self, event: str, call_back) -> None:
+        """
+        Unregister a callback for a given event.
+
+        Args:
+            event (str): The name of the event
+            call_back (Any): The function to execute on callback
+        """
+        self.events_publisher.unregister(
+            event_action=event,
+            subscriber_callabck=call_back)
+        self.mac_logger.debug(
+            f"Unregistered a callback {call_back} for {event}.")
 
     def __getitem__(self, keys: any) -> any:
         """
@@ -200,6 +258,13 @@ class MacSettings(metaclass=MacSingleInstance):
         self.__file_change_handler._pause_observer = True
         self.save_settings()
         self.__file_change_handler._pause_observer = False
+        changed_setting = {
+            "setting_changed": keys,
+            "new_value": value}
+        change_event = MacEvent(
+            event_action=self.events[0],
+            event_info=changed_setting)
+        self.events_publisher.post_event(event=change_event)
 
     def __contains__(self, keys: any) -> bool:
         """
@@ -271,25 +336,6 @@ class MacSettings(metaclass=MacSingleInstance):
         shutil.copyfile(src=self.default_settings_path,
                         dst=self.settings_file_path)
         self.mac_logger.info("Default settings copied into place.")
-
-    def register_callback_on_change_event(
-            self,
-            call_back_function: object) -> None:
-        """
-        Register a callback thatwill be called when there's a change
-        to the settings file.
-
-        Args:
-            call_back_function (object): The function to be called.
-        """
-        if call_back_function not in self._call_backs:
-            self._call_backs.append(call_back_function)
-
-    def _execute_callbacks(self) -> None:
-        """
-        Run though all the callback functions registered.
-        """
-        [call_back() for call_back in self._call_backs]
 
 
 if __name__ == "__main__":  # pragma: no cover
