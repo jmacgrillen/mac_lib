@@ -28,6 +28,7 @@ import shutil
 import pathlib
 import os
 import sys
+import copy
 from threading import Lock
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -36,6 +37,19 @@ import maclib.mac_logger as mac_logger
 from maclib.mac_single import MacSingleInstance
 from maclib.mac_exception import MacException
 from maclib.mac_events import MacEventPublisher, MacEvent
+
+
+def dict_diff(dict_a: dict, dict_b: dict) -> dict:
+    """
+    Return the difference between two dictionaries.
+    """
+    changes: dict = {}
+    changes['added'] = {k: dict_b[k] for k in dict_b.keys() - dict_a.keys()}
+    changes['removed'] = {k: dict_a[k] for k in dict_a.keys() - dict_b.keys()}
+    common_keys = dict_a.keys() & dict_b.keys()
+    changes['changed'] = {k: (dict_a[k], dict_b[k]) for k in common_keys
+                          if dict_a[k] != dict_b[k]}
+    return changes
 
 
 class MacSettingsException(MacException):
@@ -101,8 +115,7 @@ class MacSettings(metaclass=MacSingleInstance):
     __thread_lock: Lock
     events = [
         "settings_change",
-        "settings_loaded",
-        "settings_reload"]
+        "settings_loaded"]
 
     def __init__(self,
                  app_name: str,
@@ -179,11 +192,16 @@ class MacSettings(metaclass=MacSingleInstance):
         Reload the settings.
         """
         self.mac_logger.debug("Reloading the settings from the file.")
+        previous_settings = copy.deepcopy(self.__app_settings)
         self.load_settings()
-        update_event = MacEvent(
-                event_action=self.events[2])
-        self.__settings_object.events_publisher.publish(
-                update_event)
+        if previous_settings != self.__app_settings:
+            changes = dict_diff(dict_a=previous_settings,
+                                dict_b=self.__app_settings)
+            update_event = MacEvent(
+                    event_action=self.events[0],
+                    event_data=changes)
+            self.__settings_object.events_publisher.publish(
+                    update_event)
 
     def register_for_events(self, event: str, call_back) -> None:
         """
