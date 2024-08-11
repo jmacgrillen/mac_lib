@@ -19,7 +19,7 @@
     Copyright:
         Copyright (c) John MacGrillen. All rights reserved.
 """
-from typing import Optional
+from typing import Optional, Any
 from functools import reduce
 import operator
 import logging
@@ -95,7 +95,7 @@ class MacSettingsWatchdogHandler(FileSystemEventHandler):
             self.mac_logger.debug("File change detected.")
             update_event = MacEvent(
                 event_action=self.events[0])
-            self.events_publisher.publish(
+            self.events_publisher.post_event(
                 update_event)
 
 
@@ -199,8 +199,8 @@ class MacSettings(metaclass=MacSingleInstance):
                                 dict_b=self.__app_settings)
             update_event = MacEvent(
                     event_action=self.events[0],
-                    event_data=changes)
-            self.__settings_object.events_publisher.publish(
+                    event_info=changes)
+            self.events_publisher.post_event(
                     update_event)
 
     def register_for_events(self, event: str, call_back) -> None:
@@ -231,7 +231,7 @@ class MacSettings(metaclass=MacSingleInstance):
         self.mac_logger.debug(
             f"Unregistered a callback {call_back} for {event}.")
 
-    def __getitem__(self, keys: any) -> any:
+    def __getitem__(self, keys: Any) -> Any:
         """
         Get the value from the underlying settings dictionary.
 
@@ -255,7 +255,7 @@ class MacSettings(metaclass=MacSingleInstance):
                 value = (reduce(operator.getitem, keys, self.__app_settings))
         return value
 
-    def __setitem__(self, keys: any, value: any) -> None:
+    def __setitem__(self, keys: Any, value: Any) -> None:
         """
         Set the value of an item in the dictionary. This is slightly different
         from the multi-index pattern in that the key names are passed as a
@@ -284,7 +284,7 @@ class MacSettings(metaclass=MacSingleInstance):
             event_info=changed_setting)
         self.events_publisher.post_event(event=change_event)
 
-    def __contains__(self, keys: any) -> bool:
+    def __contains__(self, keys: Any) -> bool:
         """
         Check whether the key exists
 
@@ -346,10 +346,10 @@ class MacSettings(metaclass=MacSingleInstance):
         parent_directory = pathlib.Path(
             self.settings_file_path).parent.absolute()
         print(self.settings_file_path)
-        if not file_m.does_exist(parent_directory):
+        if not file_m.does_exist(str(parent_directory)):
             self.mac_logger.info(
                 "Settings file parent directory needs to be created")
-            file_m.create_dir(parent_directory)
+            file_m.create_dir(str(parent_directory))
         self.mac_logger.info("Copying default settings...")
         shutil.copyfile(src=self.default_settings_path,
                         dst=self.settings_file_path)

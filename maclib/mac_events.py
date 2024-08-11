@@ -12,7 +12,9 @@
     Copyright:
         Copyright (c) John MacGrillen. All rights reserved.
 """
+import logginkg
 from maclib.mac_exception import MacException
+from maclib.mac_logger import LOGGER_NAME
 from dataclasses import dataclass, field
 from threading import Lock
 
@@ -38,11 +40,13 @@ class MacEventPublisher(object):
     subscribers: dict
     valid_events: list
     __lock: Lock
+    m_logger: logging.Logger
 
     def __init__(self, valid_events: list):
         self.subscribers = dict()
         self.valid_events = valid_events
         self.__lock = Lock()
+        self.m_logger = logging.getLogger(LOGGER_NAME)
         with self.__lock:
             for valid_event in valid_events:
                 self.subscribers[valid_event] = list()
@@ -54,6 +58,9 @@ class MacEventPublisher(object):
         with self.__lock:
             if event_action in self.subscribers.keys():
                 self.subscribers[event_action].append(subscriber_callabck)
+                self.m_logger.debug(f"Function {subscriber_callabck} has been"
+                                    " registered against event "
+                                    f"{event_action}.")
             else:
                 raise MacEventException(
                     str_message=f"The event type {event_action} is not a "
@@ -75,6 +82,8 @@ class MacEventPublisher(object):
         with self.__lock:
             if event.event_action in self.subscribers.keys():
                 for subscriber in self.subscribers[event.event_action]:
+                    self.m_logger.debug(f"Posting event {event.event_action} "
+                                        f"to subscriber {subscriber}.")
                     subscriber(event)
             else:
                 raise MacEventException(
