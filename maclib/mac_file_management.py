@@ -1,4 +1,5 @@
-#! /usr/bin/env python -*- coding: utf-8 -*-
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 """
     Name:
         mac_file_management.py
@@ -27,12 +28,21 @@ class FileDoesNotExistException(MacException):
     As file does not exist is a useful exception lets create
     a resusable one here.
     """
+
     pass
 
 
 def does_exist(os_path: str) -> bool:
     """
     Check whether the file exists.
+
+    Args:
+        os_path (str):
+            The full os path to the directory/file.
+
+    Return:
+        bool:
+            True if the os_path exists, otherwise False.
     """
     return Path(os_path).exists()
 
@@ -40,6 +50,14 @@ def does_exist(os_path: str) -> bool:
 def can_read(os_path: str) -> bool:
     """
     Check whether the file can be read from.
+
+    Args:
+        os_path (str):
+            The full path to the directory/file
+
+    Return:
+        bool:
+            True if we have read access to os_path, otherwise false.
     """
     return os.access(path=os_path, mode=os.R_OK)
 
@@ -47,6 +65,14 @@ def can_read(os_path: str) -> bool:
 def can_write_to(os_path: str) -> bool:
     """
     Check whether the file object can be written to.
+
+    Args:
+        os_path (str):
+            The full path to the directiry/file.
+
+    Return:
+        bool:
+            True if we have write access to os_path, otherwise false.
     """
     return os.access(path=os_path, mode=os.W_OK)
 
@@ -54,6 +80,14 @@ def can_write_to(os_path: str) -> bool:
 def get_parent_dir(os_path: str) -> str:
     """
     Get the parent directory.
+
+    Args:
+        os_path (str):
+            The full path to the directoy/path.
+
+    Return:
+        str:
+            The full path of the parent directory. 
     """
     return str(Path(os_path).parents[1])
 
@@ -61,6 +95,14 @@ def get_parent_dir(os_path: str) -> str:
 def delete_file(os_path: str) -> bool:
     """
     Delete the selected file.
+
+    Args:
+        os_path (str):
+            The full path to the directory/path.
+
+    Return:
+        bool:
+            True if the file was deleted, false otherwise.
     """
     if does_exist(os_path):
         file_logging.info(f"Deleting file {os_path}")
@@ -77,6 +119,14 @@ def delete_file(os_path: str) -> bool:
 def create_dir(dir_path: str) -> bool:
     """
     Create a new directory.
+
+    Args:
+        dir_path (str):
+            The name of the directory we want to create.
+
+    Return:
+        bool:
+            True if the directory was successfully created, otherwise false.
     """
     if not does_exist(dir_path):
         if can_write_to(get_parent_dir(dir_path)):
@@ -87,8 +137,10 @@ def create_dir(dir_path: str) -> bool:
                 file_logging.error("Unable to create the directory")
                 return False
         else:
-            err_msg = "Do not have permssions to create directory " \
-                      f"under {get_parent_dir(dir_path)}"
+            err_msg = (
+                "Do not have permssions to create directory "
+                f"under {get_parent_dir(dir_path)}"
+            )
             file_logging.error(err_msg)
             return False
     else:

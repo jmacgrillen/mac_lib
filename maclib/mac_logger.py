@@ -37,31 +37,35 @@ FORMAT_JSON = 2
 LOGGER_NAME = Path(inspect.stack()[-1][1]).stem
 
 
-def configure_logger(app_name: str = None,
-                     logging_level: int = logging.INFO,
-                     logger_name: str = LOGGER_NAME,
-                     console_only: bool = False,
-                     suppress_console: bool = False,
-                     use_format: int = FORMAT_SYSLOG) -> logging.Logger:
+def configure_logger(
+    app_name: str = None,
+    logging_level: int = logging.INFO,
+    logger_name: str = LOGGER_NAME,
+    console_only: bool = False,
+    suppress_console: bool = False,
+    use_format: int = FORMAT_SYSLOG,
+) -> logging.Logger:
     """
     Setup the built in logger to work as we want it.
 
     Args:
-        app_name (str): The name given to the application.
-        logging_level (int): What level do we want to start logging at?
-                             Default is set to INFO
-        logger_name (str): Set the logger name. The default will be the name
-                           of the process. It can overridden here, but won't
-                           be persistent.
-        console_only (bool): Don't output to file/Event Log, only to the
-                             console.
-        suppress_console (bool): Don't output to the console, only to the
-                                 file/Event Log.
-        use_format (int): Format the output as SYSLOG or JSON. Default is
-                          SYSLOG.
+        app_name (str):
+            The name given to the application.
+        logging_level (int):
+            What level do we want to start logging at? Default is set to INFO
+        logger_name (str):
+            Set the logger name. The default will be the name of the process.
+            It can overridden here, but won't be persistent.
+        console_only (bool):
+            Don't output to file/Event Log, only to the console.
+        suppress_console (bool): 
+            Don't output to the console, only to the file/Event Log.
+        use_format (int):
+            Format the output as SYSLOG or JSON. Default is SYSLOG.
 
-    Returns:
-        logging.logger: A fully configured persisten logger
+    Return:
+        logging.logger:
+            A fully configured persistent logger
     """
     # We may not need a file, so only configure it if it's been set.
     # Otherwise just dump to the console.
@@ -71,16 +75,21 @@ def configure_logger(app_name: str = None,
     log_file_uri: str
     format_config: str
     date_config: str
-    tz: str = time.strftime('%z')
+    tz: str = time.strftime("%z")
 
     if use_format is FORMAT_JSON:
-        format_config = "{ event_time : \"%(asctime)s.%(msecs)03dZ" + tz + \
-                        "\", level: \"%(levelname)s\", function_name: \"" \
-                        "%(module)s.%(funcName)s\", message: \"" \
-                        "%(message)s\" }"
+        format_config = (
+            '{ event_time : "%(asctime)s.%(msecs)03dZ'
+            + tz
+            + '", level: "%(levelname)s", function_name: "'
+            '%(module)s.%(funcName)s", message: "'
+            '%(message)s" }'
+        )
     else:
-        format_config = "%(asctime)s.%(msecs)03dZ" + tz + " %(levelname)s " \
-                        "%(module)s.%(funcName)s %(message)s"
+        format_config = (
+            "%(asctime)s.%(msecs)03dZ" + tz + " %(levelname)s "
+            "%(module)s.%(funcName)s %(message)s"
+        )
 
     # ISO8601 Time format
     date_config = "%Y-%m-%dT%H:%M:%S"
@@ -88,31 +97,27 @@ def configure_logger(app_name: str = None,
     # Create the log formatter. use the same format across all platforms.
     # I know Windows does it's own thing, but this way the log event
     # will look the same regardless of environment.
-    log_formatter = logging.Formatter(
-            fmt=format_config,
-            datefmt=date_config)
+    log_formatter = logging.Formatter(fmt=format_config, datefmt=date_config)
     log_formatter.converter = time.gmtime
     mac_logger = logging.getLogger(name=logger_name)
 
     # Added support for macOS X as well as Linux/BSD
-    if 'darwin' == sys.platform:  # pragma: no cover
-        log_file_uri = os.path.expanduser(
-                '~/Library/Logs')
-        log_file_uri = f'{log_file_uri}/{app_name}.log'
+    if "darwin" == sys.platform:  # pragma: no cover
+        log_file_uri = os.path.expanduser("~/Library/Logs")
+        log_file_uri = f"{log_file_uri}/{app_name}/{app_name}.log"
     else:
-        log_file_uri = os.path.expanduser(
-                '~/.local/state')
-        log_file_uri = f'{log_file_uri}/{app_name}.log'
+        log_file_uri = os.path.expanduser("~/.local/state")
+        log_file_uri = f"{log_file_uri}/{app_name}/{app_name}.log"
 
     if console_only:
         log_file_handler = logging.StreamHandler()
-    elif 'win32' == sys.platform:  # pragma: no cover
+    elif "win32" == sys.platform:  # pragma: no cover
         # On Windows log records go to the Windows Event Log.
         # Worth noting that debug messages will appear as
         # Information messages in the application Event Log.
         log_file_handler = logging.handlers.NTEventLogHandler(
-            appname=app_name,
-            logtype="Application")
+            appname=app_name, logtype="Application"
+        )
     else:
         # Check the logging directory is available.
         # If not create it.
@@ -120,13 +125,14 @@ def configure_logger(app_name: str = None,
             try:
                 os.makedirs(os.path.dirname(log_file_uri))
             except OSError as o_error:
-                print("Unable to create the logging directory "
-                      f"{os.path.dirname(log_file_uri)}.\n{o_error.strerror}")
+                print(
+                    "Unable to create the logging directory "
+                    f"{os.path.dirname(log_file_uri)}.\n{o_error.strerror}"
+                )
                 sys.exit(1)
         log_file_handler = logging.handlers.RotatingFileHandler(
-            filename=log_file_uri,
-            maxBytes=1048576,
-            backupCount=5)
+            filename=log_file_uri, maxBytes=1048576, backupCount=5
+        )
     log_file_handler.setFormatter(fmt=log_formatter)
 
     mac_logger.addHandler(hdlr=log_file_handler)

@@ -54,13 +54,25 @@ class MacSpinner(object):
 
     def clear_line(self):
         """
-        Clear the console line,
+        Clear the console line.
+
+        Args:
+            None
+
+        Return:
+            None
         """
         sys.stdout.write("\033[K")  # clears the line
 
     def _render(self) -> None:
         """
         Draw the spinner frame.
+
+        Args:
+            None
+
+        Return:
+            None
         """
         if self.current_frame == len(self.frames):
             self.current_frame = 0
@@ -72,9 +84,15 @@ class MacSpinner(object):
         if self.current_frame < len(self.frames):
             self.current_frame += 1
 
-    def animate(self):
+    def animate(self) -> None:
         """
         Animate the spinner
+
+        Args:
+            None
+
+        Return:
+            None
         """
         while not self.event_stop.is_set():
             self._render()
@@ -83,12 +101,24 @@ class MacSpinner(object):
     def start(self) -> None:
         """
         Start the spinner.
+
+        Args:
+            None
+
+        Return:
+            None
         """
         self.__animation_thread.start()
 
     def stop(self) -> None:
         """
         Stop the spinner
+
+        Args:
+            None
+
+        Return:
+            None
         """
         if not self.event_stop.is_set():
             self.event_stop.set()
@@ -97,12 +127,28 @@ class MacSpinner(object):
     def set_message(self, new_message: str) -> None:
         """
         Set the on screen message
+
+        Args:
+            new_message (str):
+                The message to be displayed at the front.
+
+        Return:
+            None
         """
         self.message = new_message
 
     def kill_handler(self, signum: int, frame: any) -> None:
         """
         Capture CTRL+C and kill the animation
+
+        Args:
+            signum (int):
+                The signal number recieved.
+            frame (any):
+                Pass
+
+        Return:
+            None
         """
         self.stop()
         time.sleep(1)
