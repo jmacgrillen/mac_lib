@@ -1,4 +1,5 @@
-#! /usr/bin/env python -*- coding: utf-8 -*-
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 """
     Name:
         test_logger.py
@@ -61,7 +62,8 @@ def test_logger_03_to_file(monkeypatch, tmp_path):
     """
     app_name: str = "LoggerTest"
     logger_name: str = "test_logger_syslog_to_file"
-    logger_file_name: str = f"{tmp_path}/.local/state/{app_name}.log"
+    logger_file_name: str = f"{tmp_path}/.local/state/" \
+                            f"{app_name}/{app_name}.log"
     monkeypatch.setenv('HOME', str(tmp_path))
 
     test_logger = mlogger.configure_logger(
@@ -79,7 +81,7 @@ def test_logger_04_syslog_no_file_exist(monkeypatch, tmp_path):
     """
     app_name: str = "LoggerTest"
     logger_name: str = "test_logger_syslog_no_exist"
-    logger_directory: str = f"{tmp_path}/.local/state"
+    logger_directory: str = f"{tmp_path}/.local/state/{app_name}"
 
     def isdir_output(os_path: str):
         """
@@ -113,7 +115,7 @@ def test_logger_05_syslog_file_create_error(monkeypatch, tmp_path):
     """
     app_name: str = "LoggerTest"
     logger_name: str = "test_logger_syslog_no_exist"
-    logger_directory: str = f"{tmp_path}/.local/state"
+    logger_directory: str = f"{tmp_path}/.local/state/{app_name}"
 
     def isdir_output(os_path: str):
         """

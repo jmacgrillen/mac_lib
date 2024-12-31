@@ -1,4 +1,5 @@
-#! /usr/bin/env python -*- coding: utf-8 -*-
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 """
     Name:
         test_settings.py
@@ -776,8 +777,9 @@ def test_15_test_callback_registered(monkeypatch):
     test_settings = MacSettings(
         app_name=app_name,
         default_settings_path=fake_files[1])
-    test_settings.register_callback_on_change_event(my_call_back)
-    assert my_call_back in test_settings._call_backs
+    test_settings.register_for_events("settings_change", my_call_back)
+    assert my_call_back in test_settings.events_publisher.subscribers[
+        "settings_change"]
     MacSettings.clear()
 
 
@@ -804,7 +806,7 @@ def test_18_test_watchdog_handler_no_pause(monkeypatch):
     mocked_event = 'Mocked'
 
     mock_settings = MockedMacSettings()
-    test_handler = MacSettingsWatchdogHandler(mock_settings)
+    test_handler = MacSettingsWatchdogHandler()
     test_handler._pause_observer = False
     test_handler.on_modified(mocked_event)
     assert mock_settings._load_called is True

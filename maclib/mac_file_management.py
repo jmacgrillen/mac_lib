@@ -87,7 +87,7 @@ def get_parent_dir(os_path: str) -> str:
 
     Return:
         str:
-            The full path of the parent directory. 
+            The full path of the parent directory.
     """
     return str(Path(os_path).parents[1])
 

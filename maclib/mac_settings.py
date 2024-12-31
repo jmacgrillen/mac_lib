@@ -52,7 +52,7 @@ def dict_diff(dict_a: dict, dict_b: dict) -> dict:
     Return:
         dict:
             A dictionary showing what has been added, removed, or changed
-            between dict_a and dict_b.  
+            between dict_a and dict_b.
     """
     changes: dict = {}
     changes["added"] = {k: dict_b[k] for k in dict_b.keys() - dict_a.keys()}
@@ -159,7 +159,7 @@ class MacSettings(metaclass=MacSingleInstance):
     settings_file_path: str
     default_settings_path: str
     events_publisher: MacEventPublisher
-    __settings_file_observer: Observer
+    __settings_file_observer: Observer = Observer()
     __file_change_handler: MacSettingsWatchdogHandler
     __app_settings: dict
     __thread_lock: Lock
@@ -215,7 +215,6 @@ class MacSettings(metaclass=MacSingleInstance):
         # Set the file watchdog to pick up any changes made to the settings
         # file from outside this process.
         self.__file_change_handler = MacSettingsWatchdogHandler()
-        self.__settings_file_observer = Observer()
         self.__settings_file_observer.schedule(
             event_handler=self.__file_change_handler,
             path=self.settings_file_path,
@@ -357,7 +356,7 @@ class MacSettings(metaclass=MacSingleInstance):
                 The keys can be either a string, or a tuple
             value (any):
                 The value to set the key/value to
-        
+
         Return:
             None
         """
