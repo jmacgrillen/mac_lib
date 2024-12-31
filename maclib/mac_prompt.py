@@ -1,4 +1,5 @@
-#! /usr/bin/env python -*- coding: utf-8 -*-
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 """
     Name:
         mac_prompt.py
@@ -29,14 +30,13 @@ def prompt_yes_no(question: str, default: str = "no") -> bool:
         bool: Returns True if user answers yes, or False if user answers no.
     """
     valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
-    if default is None:
-        prompt = " [y/N] "
-    elif default == "yes":
-        prompt = " [Y/n] "
-    elif default == "no":
-        prompt = " [y/N] "
-    else:
-        raise ValueError("invalid default answer: '%s'" % default)
+    match default:
+        case "yes":
+            prompt = " [Y/n] "
+        case "no":
+            prompt = " [y/N] "
+        case _:
+            raise ValueError("Invalid default answer: '%s'" % default)
 
     while True:
         sys.stdout.write(question + prompt)
