@@ -12,7 +12,6 @@
     Copyright:
         Copyright (c) John MacGrillen. All rights reserved.
 """
-
 import sys
 
 
@@ -31,9 +30,9 @@ def prompt_yes_no(question: str, default: str = "no") -> bool:
     """
     valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
     match default:
-        case "yes":
+        case "yes" | "y":
             prompt = " [Y/n] "
-        case "no":
+        case "no" | "n":
             prompt = " [y/N] "
         case _:
             raise ValueError("Invalid default answer: '%s'" % default)
