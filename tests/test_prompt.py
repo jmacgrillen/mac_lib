@@ -55,12 +55,6 @@ def test_05_wrong_input_then_right_one(monkeypatch, capfd):
     """
 
     """
-    calls = 0
-
-    def count_calls():
-        nonlocal calls
-        calls += 1
-
     inputs = iter(['maybe', 'yes'])
 
     monkeypatch.setattr('builtins.input', lambda: next(inputs))
@@ -68,6 +62,15 @@ def test_05_wrong_input_then_right_one(monkeypatch, capfd):
     captured = capfd.readouterr()
     assert captured.out.find("Please respond with 'yes' or 'no'") != -1
     assert test is True
+
+
+def test_06_test_prompt_default_value(monkeypatch):
+    """
+
+    """
+    monkeypatch.setattr('builtins.input', lambda: '')
+    test = mprompt.prompt_yes_no("test", "no")
+    assert test is False
 
 
 if __name__ == "__main__":
