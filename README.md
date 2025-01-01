@@ -11,10 +11,12 @@ The code includes:
 
 - `mac_colours.py` - Nothing earth shattering, just rgb to hex conversion
 - `mac_detect.py` - A few pieces to help identify bits like OS and Python version
+- `mac_events.py` - A simple oberver pattern event passing system
 - `mac_exception.py` - A simple exception that logs the error message into the application log
 - `mac_file_management.py` - Some routines to help me with file management
 - `mac_logger.py` - Configures the builtin logging so it logs to file and console in an easy to understand way
 - `mac_progress.py` - A simple console based progress bar
+- `mac_prompt.py` - Handle the usual ye/no prompts
 - `mac_request.py` - Small wrapper around *requests* mostly to handle persistent headers
 - `mac_settings.py` - Application settings, built on the Singleton pattern
 - `mac_single.py` - Singleton pattern class
