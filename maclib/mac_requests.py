@@ -3,10 +3,10 @@
 """
     Name:
         mac_requests.py
-    Desscription:
+    Description:
         Boiler plate code around requests.
     Version:
-        1 - Inital release
+        1 - Initial release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
     Copyright:

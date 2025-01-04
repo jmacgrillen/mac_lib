@@ -2,7 +2,7 @@
 """
     Name:
         mac_colours.py
-    Desscription:
+    Description:
         A small collection of colour conversion utilities.
     Version:
         1 - Initial release

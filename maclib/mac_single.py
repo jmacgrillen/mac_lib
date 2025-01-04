@@ -3,10 +3,10 @@
 """
     Name:
         mac_single.py
-    Desscription:
+    Description:
         Singleton pattern instance class.
     Version:
-        1 - Inital release
+        1 - Initial release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
     Copyright:

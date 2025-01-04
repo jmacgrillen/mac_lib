@@ -3,10 +3,10 @@
 """
     Name:
         mac_prompt.py
-    Desscription:
+    Description:
         Handle a yes/no user prompt.
     Version:
-        1 - Inital release
+        1 - Initial release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
     Copyright:

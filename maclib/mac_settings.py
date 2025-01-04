@@ -3,7 +3,7 @@
 """
     Name:
         mac_settigs.py
-    Desscription:
+    Description:
         Manage applicatuon settings from a YAML file.
         There should be a set of defaults.
     Version:
@@ -14,7 +14,7 @@
         2 - Settings are now automatically created where they
             should be based on the platform the program is running
             on. No longer need to remember where they should be.
-        1 - Inital release
+        1 - Initial release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
     Copyright:

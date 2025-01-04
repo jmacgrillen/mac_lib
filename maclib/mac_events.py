@@ -3,7 +3,7 @@
 """
     Name:
         mac_events.py
-    Desscription:
+    Description:
         A simple Observer pattern implementation. This
         is not complicated,but is multithreaded.
     Version:

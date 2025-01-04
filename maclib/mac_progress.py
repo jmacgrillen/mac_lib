@@ -3,12 +3,12 @@
 """
     Name:
         mac_progress.py
-    Desscription:
+    Description:
         This is very heavily based on this gist
         https://gist.github.com/vladignatyev/06860ec2040cb497f0f3
         Originally released under the MIT License.
     Version:
-        1 - Inital release
+        1 - Initial release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
     Copyright:

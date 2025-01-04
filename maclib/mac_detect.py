@@ -3,11 +3,11 @@
 """
     Name:
         mac_detect.py
-    Desscription:
+    Description:
         Find out about the platform the program is running on
         to help with trouble shooting.
     Version:
-        1 - Inital release
+        1 - Initial release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
     Copyright:

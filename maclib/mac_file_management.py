@@ -3,10 +3,10 @@
 """
     Name:
         mac_file_management.py
-    Desscription:
+    Description:
         The Mac Library settinsg file manager.
     Version:
-        1 - Inital release
+        1 - Initial release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
     Copyright:

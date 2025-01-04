@@ -3,10 +3,10 @@
 """
     Name:
         mac_spinner.py
-    Desscription:
+    Description:
         Lightweight console bassed spinner.
     Version:
-        1 - Inital release
+        1 - Initial release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
     Copyright:

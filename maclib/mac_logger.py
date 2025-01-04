@@ -3,7 +3,7 @@
 """
     Name:
         mac_logger.py
-    Desscription:
+    Description:
         Setup logging to include:
          - ISO8601 date formatting.
          - Render as SYSLOG or JSON.
@@ -17,7 +17,7 @@
           - Added support for macOS X
           - Automatically places the log file in the correct folder for the
             platform.
-        1 - Inital release
+        1 - Initial release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
     Copyright:
@@ -50,23 +50,15 @@ def configure_logger(
     Setup the built in logger to work as we want it.
 
     Args:
-        app_name (str):
-            The name given to the application.
-        logging_level (int):
-            What level do we want to start logging at? Default is set to INFO
-        logger_name (str):
-            Set the logger name. The default will be the name of the process.
-            It can overridden here, but won't be persistent.
-        console_only (bool):
-            Don't output to file/Event Log, only to the console.
-        suppress_console (bool): 
-            Don't output to the console, only to the file/Event Log.
-        use_format (int):
-            Format the output as SYSLOG or JSON. Default is SYSLOG.
+        app_name (str): The name given to the application.
+        logging_level (int): The logging level. Default is INFO.
+        logger_name (str): The logger name. Default is the name of the process.
+        console_only (bool): If True, log only to the console.
+        suppress_console (bool): If True, suppress console logging.
+        use_format (int): Format the output as SYSLOG or JSON. Default is SYSLOG.
 
-    Return:
-        logging.logger:
-            A fully configured persistent logger
+    Returns:
+        logging.Logger: A fully configured persistent logger.
     """
     # We may not need a file, so only configure it if it's been set.
     # Otherwise just dump to the console.
@@ -78,7 +70,7 @@ def configure_logger(
     date_config: str
     tz: str = time.strftime("%z")
 
-    if use_format is FORMAT_JSON:
+    if use_format == FORMAT_JSON:
         format_config = (
             '{ event_time : "%(asctime)s.%(msecs)03dZ'
             + tz
@@ -143,6 +135,7 @@ def configure_logger(
         log_std_out = logging.StreamHandler(stream=sys.stdout)
         log_std_out.setFormatter(fmt=log_formatter)
         mac_logger.addHandler(hdlr=log_std_out)
+
     mac_logger.setLevel(level=logging_level)
     return mac_logger
 

@@ -3,10 +3,10 @@
 """
     Name:
         mac_exception.py
-    Desscription:
+    Description:
         Base exception class that includes capturing the exception in the log.
     Version:
-        1 - Inital release
+        1 - Initial release
     Author:
         J.MacGrillen <macgrillen@gmail.com>
     Copyright:
