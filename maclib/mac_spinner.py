@@ -21,6 +21,36 @@ import signal
 class MacSpinner(object):
     """
     A simple lightweight console spinner
+
+    Attributes:
+        message (str):
+            The message to be displayed.
+        current_frame (int):
+            The current animation frame of the spinner.
+        __animation_thread (threading.Thread):
+            The thread that runs the spinner animation.
+        event_stop (threading.Event):
+            The event that stops the spinner.
+        frames (list):
+            The frames of the spinner that will be animated.
+
+    Methods:
+        __init__:
+            Initialise the spinner.
+        clear_line:
+            Clear the console line.
+        _render:
+            Draw the spinner frame.
+        animate:
+            Animate the spinner.
+        start:
+            Start the spinner.
+        stop:
+            Stop the spinner.
+        set_message:
+            Set the message to be displayed.
+        kill_handler:
+            Capture CTRL+C and kill the animation.
     """
     message: str
     current_frame: int

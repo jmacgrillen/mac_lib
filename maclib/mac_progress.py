@@ -20,6 +20,18 @@ import sys
 def progress(count: any, total: any, status: str = '') -> float:
     """
     Console based progress bar.
+
+    Args:
+        count (any):
+            The current progress.
+        total (any):
+            The total number that represents 100% complete.
+        status (str):
+            The status message to display.
+
+    Return:
+        float:
+            The percentage complete.
     """
     bar_len: int = 55
     filled_len: int = int(round(bar_len * count / float(total)))

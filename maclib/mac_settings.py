@@ -80,6 +80,26 @@ class MacSettingsWatchdogHandler(FileSystemEventHandler):
     Set a watcher on the settings file, so we can check
     whether there have been changes made. If there is then
     we reload the settings.
+
+    Attributes:
+        mac_logger (logging.Logger):
+            The logger object for this class.
+        _pause_observer (bool):
+            Whether to pause the observer. This is useful when we're
+            updating the settings file from within the program.
+        events_publisher (MacEventPublisher):
+            The event publisher object.
+        events (list):
+            A list of events that can be published.
+
+    Methods:
+        on_modified(event):
+            We're only interested in whether the file has been changed or not.
+            Send the reload event to the registered class(es).
+        on_created(event):
+            Register whether the file has been created or not.
+        on_delete(event):
+            Register when the file has been deleted.
     """
 
     mac_logger: logging.Logger
@@ -153,7 +173,29 @@ class MacSettings(metaclass=MacSingleInstance):
     """
     Handle global apps setting using a singleton class.
     Make sure the logger is initialised before calling this class.
-    """
+
+    Attributes:
+        mac_logger (logging.Logger):
+            The logger object for this class.
+        settings_file_directory (str):
+            The directory where the settings file should be.
+        settings_file_path (str):
+            The full path to the settings file.
+        default_settings_path (str):
+            The full path to the default settings file.
+        events_publisher (MacEventPublisher):
+            The event publisher object.
+        __settings_file_observer (Observer):
+            The observer object for the settings file.
+        __file_change_handler (MacSettingsWatchdogHandler):
+            The file change handler object.
+        __app_settings (dict):
+            The dictionary of settings.
+        __thread_lock (Lock):
+            The lock object for the settings dictionary.
+        events (list):
+            The list of valid events that can be published.
+        """
 
     mac_logger: logging.Logger
     settings_file_directory: str

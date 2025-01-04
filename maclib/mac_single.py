@@ -20,6 +20,17 @@ class MacSingleInstance(type):
     This class is following the Singleton pattern, a class that
     is a single instance that persists across all modules no matter
     how many times the program calls for a new instance.
+
+    Attributes:
+        _instances (WeakValueDictionary):
+            A dictionary of instances of the class.
+
+    Methods:
+        __call__:
+            Create a new instance of the class if it does not exist. If it does
+            exist, return the existing instance.
+        clear:
+            Remove the singleton.
     """
     _instances = WeakValueDictionary()
 

@@ -25,6 +25,28 @@ else:  # pragma: no cover
 class MacDetect(object):
     """
     Gather some information about the platform we're running on.
+
+    Attributes:
+        os_name (str):
+            The name of the operating system.
+        os_version (str):
+            The version of the operating system.
+        os_theme (str):
+            The theme the operating system is using.
+        architecture (str):
+            The architecture of the operating system.
+        python_version (str):
+            The version of python we're running.
+        python_compiler (str):
+            The compiler used to compile python.
+        python_implementation (str):
+            The implementation of python we're running.
+
+    Methods:
+        __init__(self):
+            Run through the platform and gather the info.
+        detect_windows_theme(self) -> str:
+            Check whether Windows is using dark mode or not.
     """
     os_name: str
     os_version: str
@@ -37,6 +59,9 @@ class MacDetect(object):
     def __init__(self):
         """
         Run through the platform and gather the info.
+
+        Args:
+            None
         """
         platform_info = platform.uname()
         self.os_name = platform_info[0]
@@ -51,6 +76,13 @@ class MacDetect(object):
     def detect_windows_theme(self) -> str:
         """
         Check whether Windows is using dark  mode or not.
+
+        Args:
+            None
+
+        Return:
+            str:
+                The theme Windows is using.
         """
         key = winreg.OpenKey(key=winreg.HKEY_CURRENT_USER,
                              sub_key="Software\\Microsoft\\Windows\\"

@@ -25,6 +25,10 @@ class MacException(Exception):
     def __init__(self, str_message: str):
         """
         Raise the exception just like normal.
+
+        Args:
+            str_message (str):
+                The message to log and display back to the user.
         """
         m_logger = logging.getLogger(mac_logger.LOGGER_NAME)
         str_message = f"Exception - {str_message}"
