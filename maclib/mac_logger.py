@@ -55,7 +55,8 @@ def configure_logger(
         logger_name (str): The logger name. Default is the name of the process.
         console_only (bool): If True, log only to the console.
         suppress_console (bool): If True, suppress console logging.
-        use_format (int): Format the output as SYSLOG or JSON. Default is SYSLOG.
+        use_format (int): Format the output as SYSLOG or JSON. Default is
+        SYSLOG.
 
     Returns:
         logging.Logger: A fully configured persistent logger.
