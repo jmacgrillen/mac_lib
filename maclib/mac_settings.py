@@ -30,6 +30,7 @@ import pathlib
 import os
 import sys
 import copy
+from enum import Enum, auto
 from threading import Lock
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -75,6 +76,16 @@ class MacSettingsException(MacException):
     pass
 
 
+class MacSettingsWatchdogEvents(Enum):
+    """
+    The Events to publish for the settings files.
+    """
+
+    reload_settings_file = auto()
+    settings_file_created = auto()
+    settings_file_deleted = auto()
+
+
 class MacSettingsWatchdogHandler(FileSystemEventHandler):
     """
     Set a watcher on the settings file, so we can check
@@ -105,11 +116,6 @@ class MacSettingsWatchdogHandler(FileSystemEventHandler):
     mac_logger: logging.Logger
     _pause_observer: bool = False
     events_publisher: MacEventPublisher
-    events = [
-        "reload_settings_file",
-        "settings_file_created",
-        "settings_file_deleted",
-    ]
 
     def __init__(self):
         """
@@ -117,7 +123,7 @@ class MacSettingsWatchdogHandler(FileSystemEventHandler):
         """
         super(MacSettingsWatchdogHandler).__init__()
         self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
-        self.events_publisher = MacEventPublisher(self.events)
+        self.events_publisher = MacEventPublisher(MacSettingsWatchdogEvents)
 
     def on_modified(self, event) -> None:
         """
@@ -133,7 +139,9 @@ class MacSettingsWatchdogHandler(FileSystemEventHandler):
         """
         if not self._pause_observer:
             self.mac_logger.debug("File change detected.")
-            update_event = MacEvent(event_action=self.events[0])
+            update_event = MacEvent(
+                event_action=MacSettingsWatchdogEvents.reload_settings_file
+            )
             self.events_publisher.post_event(event=update_event)
 
     def on_created(self, event) -> None:
@@ -149,7 +157,9 @@ class MacSettingsWatchdogHandler(FileSystemEventHandler):
         """
         if not self._pause_observer:
             self.mac_logger.debug("File created detected")
-            create_event = MacEvent(event_action=self.events[1])
+            create_event = MacEvent(
+                event_action=MacSettingsWatchdogEvents.settings_file_created
+            )
             self.events_publisher.post_event(event=create_event)
 
     def on_delete(self, event) -> None:
@@ -165,8 +175,19 @@ class MacSettingsWatchdogHandler(FileSystemEventHandler):
         """
         if not self._pause_observer:
             self.mac_logger.debug("File delete detected")
-            delete_event = MacEvent(event_action=self.events[2])
+            delete_event = MacEvent(
+                event_action=MacSettingsWatchdogEvents.settings_file_deleted
+            )
             self.events_publisher.post_event(event=delete_event)
+
+
+class MacSettingsEvents(Enum):
+    """
+    Events for the settings file.
+    """
+
+    settings_changed = auto()
+    settings_loaded = auto()
 
 
 class MacSettings(metaclass=MacSingleInstance):
@@ -195,7 +216,7 @@ class MacSettings(metaclass=MacSingleInstance):
             The lock object for the settings dictionary.
         events (list):
             The list of valid events that can be published.
-        """
+    """
 
     mac_logger: logging.Logger
     settings_file_directory: str
@@ -241,7 +262,7 @@ class MacSettings(metaclass=MacSingleInstance):
         self.mac_logger = logging.getLogger(mac_logger.LOGGER_NAME)
         self.__app_settings = dict()
         self.__thread_lock = Lock()
-        self.events_publisher = MacEventPublisher(self.events)
+        self.events_publisher = MacEventPublisher(MacSettingsEvents)
         if not file_m.does_exist(os_path=self.default_settings_path):
             raise MacSettingsException(
                 str_message="The default settings file"
@@ -267,7 +288,7 @@ class MacSettings(metaclass=MacSingleInstance):
         # Register ourseleves with the event service to pick up
         # file change notifications.
         self.__file_change_handler.events_publisher.register(
-            event_action=self.__file_change_handler.events[0],
+            event_action=MacSettingsWatchdogEvents.reload_settings_file,
             subscriber_callabck=self.reload_settings_from_file,
         )
 
@@ -290,7 +311,9 @@ class MacSettings(metaclass=MacSingleInstance):
                     self.__app_settings = yaml.safe_load(stream=yml_file)
             self.mac_logger.info("Successfully loaded the settings.")
             print(self.__app_settings)
-            change_event = MacEvent(event_action=self.events[1])
+            change_event = MacEvent(
+                event_action=MacSettingsEvents.settings_loaded
+            )
             self.events_publisher.post_event(event=change_event)
         except yaml.YAMLError as yaml_error:
             raise MacSettingsException(
@@ -318,7 +341,8 @@ class MacSettings(metaclass=MacSingleInstance):
                 dict_a=previous_settings, dict_b=self.__app_settings
             )
             update_event = MacEvent(
-                event_action=self.events[0], event_info=changes
+                event_action=MacSettingsEvents.settings_changed,
+                event_info=changes,
             )
             self.events_publisher.post_event(update_event)
 
@@ -416,7 +440,8 @@ class MacSettings(metaclass=MacSingleInstance):
         self.__file_change_handler._pause_observer = False
         changed_setting = {"setting_changed": keys, "new_value": value}
         change_event = MacEvent(
-            event_action=self.events[0], event_info=changed_setting
+            event_action=MacSettingsEvents.settings_changed,
+            event_info=changed_setting,
         )
         self.events_publisher.post_event(event=change_event)
 
