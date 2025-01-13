@@ -70,9 +70,9 @@ class MacEventPublisher(object):
             A logger object for logging.
 
     Methods:
-        register(event_action: str, subscriber_callabck) -> None:
+        register(event_action: str, subscriber_callback) -> None:
             Register a subscriber for a given event.
-        unregister(event_action: str, subscriber_callabck) -> None:
+        unregister(event_action: str, subscriber_callback) -> None:
             Unregister a subscriber for a given event.
         post_event(event: MacEvent) -> None:
             Dispatch an event to its subscriber.
@@ -100,14 +100,14 @@ class MacEventPublisher(object):
             for valid_event in valid_events:
                 self.subscribers[valid_event] = list()
 
-    def register(self, event_action: Enum, subscriber_callabck) -> None:
+    def register(self, event_action: Enum, subscriber_callback) -> None:
         """
         Register a subscriber callback for a given event.
 
         Args:
             event_action (Enum):
                 The event action to register the subscriber callback against.
-            subscriber_callabck:
+            subscriber_callback:
                 The function to be called when the event occurs.
 
         Returns:
@@ -115,9 +115,9 @@ class MacEventPublisher(object):
         """
         with self.__lock:
             if event_action in self.subscribers.keys():
-                self.subscribers[event_action].append(subscriber_callabck)
+                self.subscribers[event_action].append(subscriber_callback)
                 self.m_logger.debug(
-                    f"Function {subscriber_callabck} has been"
+                    f"Function {subscriber_callback} has been"
                     " registered against event "
                     f"{event_action}."
                 )
@@ -127,14 +127,14 @@ class MacEventPublisher(object):
                     "valid type."
                 )
 
-    def unregister(self, event_action: Enum, subscriber_callabck) -> None:
+    def unregister(self, event_action: Enum, subscriber_callback) -> None:
         """
         Unregister a subscriber for a given event.
 
         Args:
             event_action (Enum):
                 The event action to unregister the subscriber callback against.
-            subscriber_callabck:
+            subscriber_callback:
                 The function to be unregistered.
 
         Returns:
@@ -142,8 +142,8 @@ class MacEventPublisher(object):
         """
         with self.__lock:
             if event_action in self.subscribers.keys():
-                if subscriber_callabck in self.subscribers[event_action]:
-                    self.subscribers[event_action].remove(subscriber_callabck)
+                if subscriber_callback in self.subscribers[event_action]:
+                    self.subscribers[event_action].remove(subscriber_callback)
 
     def post_event(self, event: MacEvent) -> None:
         """

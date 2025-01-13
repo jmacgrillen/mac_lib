@@ -822,7 +822,7 @@ def test_16_test_watchdog_handler_no_pause_file_changed(monkeypatch):
     test_handler._pause_observer = False
     test_handler.events_publisher.register(
         event_action=MacSettingsWatchdogEvents.reload_settings_file,
-        subscriber_callabck=mock_settings.load_settings,
+        subscriber_callback=mock_settings.load_settings,
     )
     test_handler.on_modified(event=mocked_event)
     assert mock_settings._load_called is True
@@ -855,7 +855,7 @@ def test_17_test_watchdog_handler_paused_file_changed(monkeypatch):
     test_handler._pause_observer = True
     test_handler.events_publisher.register(
         event_action=MacSettingsWatchdogEvents.reload_settings_file,
-        subscriber_callabck=mock_settings.load_settings,
+        subscriber_callback=mock_settings.load_settings,
     )
     test_handler.on_modified(mocked_event)
     assert mock_settings._load_called is False
@@ -889,7 +889,7 @@ def test_18_test_watchdog_handler_no_pause_file_created(monkeypatch):
     test_handler._pause_observer = False
     test_handler.events_publisher.register(
         event_action=MacSettingsWatchdogEvents.settings_file_created,
-        subscriber_callabck=mock_settings.load_settings,
+        subscriber_callback=mock_settings.load_settings,
     )
     test_handler.on_created(event=mocked_event)
     assert mock_settings._load_called is True
@@ -922,7 +922,7 @@ def test_19_test_watchdog_handler_paused_file_created(monkeypatch):
     test_handler._pause_observer = True
     test_handler.events_publisher.register(
         event_action=MacSettingsWatchdogEvents.settings_file_created,
-        subscriber_callabck=mock_settings.load_settings,
+        subscriber_callback=mock_settings.load_settings,
     )
     test_handler.on_created(mocked_event)
     assert mock_settings._load_called is False
@@ -956,7 +956,7 @@ def test_20_test_watchdog_handler_no_pause_file_deleted(monkeypatch):
     test_handler._pause_observer = False
     test_handler.events_publisher.register(
         event_action=MacSettingsWatchdogEvents.settings_file_deleted,
-        subscriber_callabck=mock_settings.load_settings,
+        subscriber_callback=mock_settings.load_settings,
     )
     test_handler.on_delete(event=mocked_event)
     assert mock_settings._load_called is True
@@ -989,7 +989,7 @@ def test_21_test_watchdog_handler_paused_file_deleted(monkeypatch):
     test_handler._pause_observer = True
     test_handler.events_publisher.register(
         event_action=MacSettingsWatchdogEvents.settings_file_created,
-        subscriber_callabck=mock_settings.load_settings,
+        subscriber_callback=mock_settings.load_settings,
     )
     test_handler.on_delete(mocked_event)
     assert mock_settings._load_called is False

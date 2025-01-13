@@ -289,7 +289,7 @@ class MacSettings(metaclass=MacSingleInstance):
         # file change notifications.
         self.__file_change_handler.events_publisher.register(
             event_action=MacSettingsWatchdogEvents.reload_settings_file,
-            subscriber_callabck=self.reload_settings_from_file,
+            subscriber_callback=self.reload_settings_from_file,
         )
 
     def load_settings(self) -> Optional[dict]:
@@ -360,7 +360,7 @@ class MacSettings(metaclass=MacSingleInstance):
             None
         """
         self.events_publisher.register(
-            event_action=event, subscriber_callabck=call_back
+            event_action=event, subscriber_callback=call_back
         )
         self.mac_logger.debug(
             f"Registered a callback {call_back} for {event}."
@@ -380,7 +380,7 @@ class MacSettings(metaclass=MacSingleInstance):
             None
         """
         self.events_publisher.unregister(
-            event_action=event, subscriber_callabck=call_back
+            event_action=event, subscriber_callback=call_back
         )
         self.mac_logger.debug(
             f"Unregistered a callback {call_back} for {event}."
