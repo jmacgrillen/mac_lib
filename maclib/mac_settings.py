@@ -1,24 +1,24 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    Name:
-        mac_settigs.py
-    Description:
-        Manage applicatuon settings from a YAML file.
-        There should be a set of defaults.
-    Version:
-        5 - Switched to event messages from direct callback.
-        4 - Added callback support to notify objects of settings changes.
-        3 - Added a file watcher to pickup when the settings are
-            changed by another process.
-        2 - Settings are now automatically created where they
-            should be based on the platform the program is running
-            on. No longer need to remember where they should be.
-        1 - Initial release
-    Author:
-        J.MacGrillen <macgrillen@gmail.com>
-    Copyright:
-        Copyright (c) John MacGrillen. All rights reserved.
+Name:
+    mac_settigs.py
+Description:
+    Manage applicatuon settings from a YAML file.
+    There should be a set of defaults.
+Version:
+    5 - Switched to event messages from direct callback.
+    4 - Added callback support to notify objects of settings changes.
+    3 - Added a file watcher to pickup when the settings are
+        changed by another process.
+    2 - Settings are now automatically created where they
+        should be based on the platform the program is running
+        on. No longer need to remember where they should be.
+    1 - Initial release
+Author:
+    J.MacGrillen <macgrillen@gmail.com>
+Copyright:
+    Copyright (c) John MacGrillen. All rights reserved.
 """
 from typing import Optional, Any
 from functools import reduce
@@ -34,7 +34,6 @@ from enum import Enum, auto
 from threading import Lock
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import maclib.mac_file_management as file_m
 import maclib.mac_logger as mac_logger
 from maclib.mac_single import MacSingleInstance
 from maclib.mac_exception import MacException
@@ -263,14 +262,14 @@ class MacSettings(metaclass=MacSingleInstance):
         self.__app_settings = dict()
         self.__thread_lock = Lock()
         self.events_publisher = MacEventPublisher(MacSettingsEvents)
-        if not file_m.does_exist(os_path=self.default_settings_path):
+        if not pathlib.Path(self.default_settings_path).exists():
             raise MacSettingsException(
                 str_message="The default settings file"
                 f" {self.default_settings_path} does "
                 "not exist. This is a terminal "
                 "failure."
             )
-        if not file_m.does_exist(os_path=self.settings_file_path):
+        if not pathlib.Path(self.settings_file_path).exists():
             self.mac_logger.info(
                 f"The settings file {self.settings_file_path} does "
                 "not exist. Creating a new one..."
@@ -307,10 +306,21 @@ class MacSettings(metaclass=MacSingleInstance):
         # Read the settings from a YAML file.
         try:
             with self.__thread_lock:
-                with open(file=self.settings_file_path, mode="rb") as yml_file:
-                    self.__app_settings = yaml.safe_load(stream=yml_file)
+                try:
+                    self.mac_logger.debug(
+                        f"Loading settings from {self.settings_file_path}"
+                    )
+                    with open(
+                        file=self.settings_file_path, mode="rb"
+                    ) as yml_file:
+                        self.__app_settings = yaml.safe_load(stream=yml_file)
+                except IOError as io_error:
+                    raise MacSettingsException(
+                        "Unable to read the settings file "
+                        f"{self.settings_file_path}"
+                        f" {io_error}"
+                    )
             self.mac_logger.info("Successfully loaded the settings.")
-            print(self.__app_settings)
             change_event = MacEvent(
                 event_action=MacSettingsEvents.settings_loaded
             )
@@ -532,11 +542,13 @@ class MacSettings(metaclass=MacSingleInstance):
             self.settings_file_path
         ).parent.absolute()
         print(self.settings_file_path)
-        if not file_m.does_exist(str(parent_directory)):
+        if not pathlib.Path(str(parent_directory)).exists():
             self.mac_logger.info(
                 "Settings file parent directory needs to be created"
             )
-            file_m.create_dir(str(parent_directory))
+            pathlib.Path(str(parent_directory)).mkdir(
+                parents=True, exist_ok=True
+            )
         self.mac_logger.info("Copying default settings...")
         shutil.copyfile(
             src=self.default_settings_path, dst=self.settings_file_path

@@ -1,21 +1,22 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    Name:
-        mac_spinner.py
-    Description:
-        Lightweight console bassed spinner.
-    Version:
-        1 - Initial release
-    Author:
-        J.MacGrillen <macgrillen@gmail.com>
-    Copyright:
-        Copyright (c) John MacGrillen. All rights reserved.
+Name:
+    mac_spinner.py
+Description:
+    Lightweight console bassed spinner.
+Version:
+    1 - Initial release
+Author:
+    J.MacGrillen <macgrillen@gmail.com>
+Copyright:
+    Copyright (c) John MacGrillen. All rights reserved.
 """
 import sys
 import threading
 import time
 import signal
+from typing import Any
 
 
 class MacSpinner(object):
@@ -52,30 +53,20 @@ class MacSpinner(object):
         kill_handler:
             Capture CTRL+C and kill the animation.
     """
+
     message: str
     current_frame: int
     __animation_thread: threading.Thread
     event_stop: threading.Event
-    frames = [
-        '⠋',
-        '⠙',
-        '⠹',
-        '⠸',
-        '⠼',
-        '⠴',
-        '⠦',
-        '⠧',
-        '⠇',
-        '⠏'
-    ]
+    frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 
-    def __init__(self,
-                 initial_message: str = "Running",
-                 animation_delay: float = 0.1) -> None:
+    def __init__(
+        self, initial_message: str = "Running", animation_delay: float = 0.1
+    ) -> None:
         """
         Initiaise all the variables needed to make this work.
         """
-        super(MacSpinner, self).__init__()
+        super().__init__()
         signal.signal(signal.SIGINT, self.kill_handler)
         self.event_stop = threading.Event()
         self.message = initial_message
@@ -105,15 +96,11 @@ class MacSpinner(object):
         Return:
             None
         """
-        if self.current_frame == len(self.frames):
-            self.current_frame = 0
-        out_string = f"{self.frames[self.current_frame]}" \
-                     f" {self.message}\r"
+        out_string = f"{self.frames[self.current_frame]}" f" {self.message}\r"
         self.clear_line()
         sys.stdout.write(out_string)
         sys.stdout.flush()
-        if self.current_frame < len(self.frames):
-            self.current_frame += 1
+        self.current_frame = (self.current_frame + 1) % len(self.frames)
 
     def animate(self) -> None:
         """
@@ -168,7 +155,7 @@ class MacSpinner(object):
         """
         self.message = new_message
 
-    def kill_handler(self, signum: int, frame: any) -> None:
+    def kill_handler(self, signum: int, frame: Any) -> None:
         """
         Capture CTRL+C and kill the animation
 

@@ -31,9 +31,8 @@ class MacException(Exception):
                 The message to log and display back to the user.
         """
         m_logger = logging.getLogger(mac_logger.LOGGER_NAME)
-        str_message = f"Exception - {str_message}"
         m_logger.error(str_message)
-        super(MacException, self).__init__(str_message)
+        super().__init__(str_message)
 
 
 if __name__ == "__main__":  # pragma: no cover

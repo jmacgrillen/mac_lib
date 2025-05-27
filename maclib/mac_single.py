@@ -13,37 +13,36 @@
         Copyright (c) John MacGrillen. All rights reserved.
 """
 from weakref import WeakValueDictionary
+from typing import Type, Any
 
 
 class MacSingleInstance(type):
     """
-    This class is following the Singleton pattern, a class that
-    is a single instance that persists across all modules no matter
-    how many times the program calls for a new instance.
+    This metaclass implements the Singleton pattern, ensuring that
+    only one instance of a class derived from it persists across all modules,
+    regardless of how many times the program attempts to create a new instance.
 
-    Attributes:
-        _instances (WeakValueDictionary):
-            A dictionary of instances of the class.
-
-    Methods:
-        __call__:
-            Create a new instance of the class if it does not exist. If it does
-            exist, return the existing instance.
-        clear:
-            Remove the singleton.
+    Instances are stored in a WeakValueDictionary to allow for proper
+    garbage collection when the singleton instance is no longer strongly
+    referenced elsewhere.
     """
-    _instances = WeakValueDictionary()
+    _instances: WeakValueDictionary[Type[Any], Any] = WeakValueDictionary()
 
     def __call__(cls, *args, **kwargs):
+        """
+        Creates a new instance of the class if one does not already exist.
+        If an instance already exists, the existing instance is returned.
+        """
         if cls not in cls._instances:
-            instance = cls._instances[cls] = super(
-                MacSingleInstance, cls).__call__(*args, **kwargs)
-            cls._instances[cls] = instance
+            cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
     def clear(cls):
         """
-        Remove the singleton
+        Removes the stored singleton instance for this class.
+
+        The next attempt to instantiate the class will create a new singleton
+        instance.
         """
         try:
             del cls._instances[cls]
